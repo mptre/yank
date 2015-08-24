@@ -1,0 +1,94 @@
+.Dd $Mdocdate: July 10 2015 $
+.Dt YANK 1
+.Os
+.Sh NAME
+.Nm yank
+.Nd yank terminal output to clipboard
+.Sh SYNOPSIS
+.Nm yank
+.Op Fl v
+.Op Fl d Ar delim
+.Op Fl - Ar command Op Ar argument ...
+.Sh DESCRIPTION
+Read input from
+.Pa stdin
+and draw a selection interface where all fields in the given input is
+recognized by using a given set of delimiters which defaults to space (new line
+and tab characters is always treated as delimiters). The delimiters is a
+sequence of characters represented as a string and can be overwritten using the
+.Fl d
+option.
+.Pp
+Using the
+.Em Ctrl-N
+and
+.Em Ctrl-P
+keys will move the field selection forward and backward. The interface support
+several Emacs like key bindings, see
+.Em COMMANDS .
+Pressing the return key will invoke the yank command and write the selected
+field to the its
+.Pa stdin .
+The yank command defaults to
+.Xr xsel 1
+but could be anything that accepts input on
+.Pa stdin .
+When invoking yank everything supplied after the
+.Fl -
+option will be used as the yank command, see
+.Em EXAMPLES .
+.Sh OPTIONS
+.Bl -tag -width -indent
+.It Fl v
+prints version
+.It Fl d Ar delim
+use all characters in
+.Ar delim
+as field delimiters
+.It Fl - Ar command Op Ar argument ...
+use
+.Ar command
+with zero or more
+.Ar argument
+as the yank command
+.El
+.Sh COMMANDS
+.Bl -tag -width -indent
+.It Ctrl-A
+move selection to the first field
+.It Ctrl-C
+exit without invoking the yank command
+.It Ctrl-E
+move selection to the last field
+.It Ctrl-N
+move selection one field forward
+.It Ctrl-P
+move selection one field backward
+.It Enter
+exit using the selected field
+.El
+.Sh EXAMPLES
+Yank a environment variable key or value:
+.Pp
+.Dl env | yank -d =
+.Pp
+Yank a field from a CSV file:
+.Pp
+.Dl yank -d '\&",' <file.csv
+.Pp
+If
+.Pa stdout
+is not a terminal the selected field will be written to
+.Pa stdout
+and exit without invoking the yank command:
+.Pp
+.Dl yank | cat
+.Pp
+Yank the selected field to the clipboard as opposed of the default primary
+clipboard:
+.Pp
+.Dl yank -- xsel -b
+.Sh DIAGNOSTICS
+.Ex -std
+.Sh AUTHORS
+.An "Anton Lindqvist" Aq anton.lindqvist@gmail.com
