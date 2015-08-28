@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
-#include <term.h>
+#include <termios.h>
 #include <unistd.h>
 
 /* Control characters */
@@ -170,7 +170,7 @@ input(void)
 			break;
 		}
 	}
-	in.v[in.nmemb] = 0;
+	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
 }
 
 int
