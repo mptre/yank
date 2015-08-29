@@ -265,6 +265,7 @@ tsetup(void)
 	struct termios attr;
 	struct winsize ws;
 	char *s1, *s2;
+	size_t d;
 
 	tty.in = open("/dev/tty", O_RDONLY);
 	if (!tty.in)
@@ -286,8 +287,15 @@ tsetup(void)
 			break;
 		}
 
+		d = s2 - s1;
+		if (d && !(d % tty.width))
+			/* Invariant: the line length is divisble by the
+			 * terminal width. */
+			in.nlines += d/tty.width;
+		else
+			in.nlines += d/tty.width + 1;
+
 		s2++;
-		in.nlines += (s2 - s1)/tty.width + 1;
 		in.pmemb += s2 - s1;
 		s1 = s2;
 
