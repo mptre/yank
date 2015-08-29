@@ -296,7 +296,7 @@ tsetup(void)
 			break;
 		}
 	}
-	in.v[in.pmemb] = 0;
+	memset(in.v + in.pmemb, 0, in.nmemb - in.pmemb);
 
 	tcgetattr(tty.in, &tty.attr);
 	memcpy(&attr, &tty.attr, sizeof(struct termios));
