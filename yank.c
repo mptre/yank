@@ -352,6 +352,7 @@ tmain(void)
 			sel.v = in.v + f.start;
 			/* FALLTHROUGH */
 		case CONTROL('C'):
+		case CONTROL('D'):
 			return;
 		case CONTROL('A'):
 			f.start = 0;
