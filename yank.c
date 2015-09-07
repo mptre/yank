@@ -82,6 +82,7 @@ args(int argc, const char **argv)
 			puts("yank " VERSION);
 			exit(0);
 		default:
+		usage:
 			fputs("usage: yank "
 			      "[-v] "
 			      "[-d delim] "
@@ -89,6 +90,8 @@ args(int argc, const char **argv)
 			exit(1);
 		}
 	}
+	if (optind < argc && strncmp(argv[optind - 1] , "--", 3))
+		goto usage;
 
 	for (i = optind; i < argc; i++)
 		yankargv[i - optind] = argv[i];
