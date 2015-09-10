@@ -6,6 +6,7 @@
 .Nd yank terminal output to clipboard
 .Sh SYNOPSIS
 .Nm yank
+.Op Fl l
 .Op Fl v
 .Op Fl d Ar delim
 .Op Fl - Ar command Op Ar argument ...
@@ -39,6 +40,8 @@ option will be used as the yank command, see
 .Em EXAMPLES .
 .Sh OPTIONS
 .Bl -tag -width -indent
+.It Fl l
+use only new line and tab characters as field delimiters
 .It Fl v
 prints version
 .It Fl d Ar delim
@@ -75,6 +78,12 @@ Yank a environment variable key or value:
 Yank a field from a CSV file:
 .Pp
 .Dl yank -d '\&",' <file.csv
+.Pp
+Yank a whole line using the
+.Fl l
+option:
+.Pp
+.Dl make 2>&1 | yank -l
 .Pp
 If
 .Pa stdout

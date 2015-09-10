@@ -41,6 +41,10 @@ Examples
 
     yank -d \", <file.csv
 
+  - Yank a whole line using the `-l' option:
+
+    make 2>&1 | yank -l
+
   - If `stdout' is not a terminal the selected field will be written to `stdout'
     and exit without invoking the yank command:
 

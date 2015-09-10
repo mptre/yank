@@ -73,10 +73,13 @@ args(int argc, const char **argv)
 	memset(yankargv, 0, n);
 	yankargv[0] = YANKCMD;
 
-	while ((c = getopt(argc, (char * const *) argv, "vd:")) != -1) {
+	while ((c = getopt(argc, (char * const *) argv, "lvd:")) != -1) {
 		switch (c) {
 		case 'd':
 			delim = optarg;
+			break;
+		case 'l':
+			delim = "";
 			break;
 		case 'v':
 			puts("yank " VERSION);
@@ -84,6 +87,7 @@ args(int argc, const char **argv)
 		default:
 		usage:
 			fputs("usage: yank "
+			      "[-l] "
 			      "[-v] "
 			      "[-d delim] "
 			      "[-- command [argument ...]]\n", stderr);
