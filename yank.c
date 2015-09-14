@@ -9,7 +9,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-/* Control characters */
+/* Terminal capabilities */
 #define T_CLR_EOS             "\033[J"
 #define T_COLUMN_ADDRESS      "\033[%dG"
 #define T_CURSOR_INVISIBLE    "\033[?25l"
@@ -65,14 +65,6 @@ args(int argc, const char **argv)
 	size_t n;
 	int c, i;
 
-	/* Ensure space for null terminator. */
-	n = (argc + 1)*sizeof(const char *);
-	yankargv = malloc(n);
-	if (!yankargv)
-		perror("malloc");
-	memset(yankargv, 0, n);
-	yankargv[0] = YANKCMD;
-
 	while ((c = getopt(argc, (char * const *) argv, "lvd:")) != -1) {
 		switch (c) {
 		case 'd':
@@ -87,8 +79,7 @@ args(int argc, const char **argv)
 		default:
 		usage:
 			fputs("usage: yank "
-			      "[-l] "
-			      "[-v] "
+			      "[-l | -v] "
 			      "[-d delim] "
 			      "[-- command [argument ...]]\n", stderr);
 			exit(1);
@@ -97,6 +88,13 @@ args(int argc, const char **argv)
 	if (optind < argc && strncmp(argv[optind - 1] , "--", 3))
 		goto usage;
 
+	/* Ensure space for yank command and null terminator. */
+	n = (argc - optind + 2)*sizeof(const char *);
+	yankargv = malloc(n);
+	if (!yankargv)
+		perror("malloc");
+	memset(yankargv, 0, n);
+	yankargv[0] = YANKCMD;
 	for (i = optind; i < argc; i++)
 		yankargv[i - optind] = argv[i];
 }
@@ -105,7 +103,7 @@ args(int argc, const char **argv)
  * Returns the next unicode rune offset relative to s + offset in the direction
  * given by inc.
  */
-static ssize_t
+ssize_t
 rune(const char *s, size_t offset, int inc)
 {
 	ssize_t i;
@@ -220,7 +218,7 @@ yank(void)
 	if (write(fd[1], sel.v, sel.nmemb) < 0)
 		perror("write");
 	if (close(fd[1]) < 0)
-	    perror("close");
+		perror("close");
 	pid = fork();
 	switch (pid) {
 	case -1:
@@ -341,53 +339,50 @@ tend(void)
 void
 tmain(void)
 {
-	struct { size_t start; size_t stop; } f, reset;
+	size_t start, stop;
 	int c;
 
-	f.start = f.stop = 0;
-	if (field(in.v, 1, &f.start, &f.stop))
-		tdraw(in.v, in.pmemb, f.start, f.stop);
+	start = stop = 0;
+	if (field(in.v, 1, &start, &stop))
+		tdraw(in.v, in.pmemb, start, stop);
 	else
 		twrite(in.v, in.pmemb);
 	for (;;) {
-		reset = f;
 		if (read(tty.in, &c, 1) < 0)
 			perror("read");
 		switch (c & 0xFF) {
 		case '\n':
-			sel.nmemb = f.stop - f.start + 1;
-			sel.v = in.v + f.start;
+			sel.nmemb = stop - start + 1;
+			sel.v = in.v + start;
 			/* FALLTHROUGH */
 		case CONTROL('C'):
 		case CONTROL('D'):
 			return;
 		case CONTROL('A'):
-			f.start = 0;
+			start = 0;
 		if (0) {
 		case CONTROL('N'):
-			f.start = f.stop + rune(in.v, f.stop, 1);
+			start = stop + rune(in.v, stop, 1);
 		}
-			if (field(in.v, 1, &f.start, &f.stop))
-				break;
-			f = reset;
-			continue;
+			if (!field(in.v, 1, &start, &stop))
+				continue;
+			break;
 		case CONTROL('E'):
-			f.stop = in.pmemb - 1;
+			stop = in.pmemb - 1;
 		if (0) {
 		case CONTROL('P'):
-			f.stop = f.start + rune(in.v, f.start, -1);
+			stop = start + rune(in.v, start, -1);
 		}
-			if (field(in.v, -1, &f.stop, &f.start))
-				break;
-			f = reset;
-			continue;
+			if (!field(in.v, -1, &stop, &start))
+				continue;
+			break;
 		default:
 			continue;
 		}
 		if (in.nlines)
 			tprintf(T_CURSOR_UP, in.nlines);
 		tprintf(T_COLUMN_ADDRESS, 1);
-		tdraw(in.v, in.pmemb, f.start, f.stop);
+		tdraw(in.v, in.pmemb, start, stop);
 	}
 }
 

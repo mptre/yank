@@ -6,8 +6,7 @@
 .Nd yank terminal output to clipboard
 .Sh SYNOPSIS
 .Nm yank
-.Op Fl l
-.Op Fl v
+.Op Fl l | v
 .Op Fl d Ar delim
 .Op Fl - Ar command Op Ar argument ...
 .Sh DESCRIPTION
@@ -40,14 +39,14 @@ option will be used as the yank command, see
 .Em EXAMPLES .
 .Sh OPTIONS
 .Bl -tag -width -indent
-.It Fl l
-use only new line and tab characters as field delimiters
-.It Fl v
-prints version
 .It Fl d Ar delim
 use all characters in
 .Ar delim
 as field delimiters
+.It Fl l
+use only new line and tab characters as field delimiters
+.It Fl v
+prints version
 .It Fl - Ar command Op Ar argument ...
 use
 .Ar command
