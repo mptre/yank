@@ -3,7 +3,7 @@ VERSION = 0.2.0
 PREFIX  ?= /usr/local
 YANKCMD ?= xsel
 
-CFLAGS   += -O2 -pedantic -std=c99 -Wall -Werror -Wextra
+CFLAGS   += -Os -pedantic -std=c99 -Wall -Werror -Wextra
 CPPFLAGS += -DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 yank: yank.c
