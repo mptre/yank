@@ -6,7 +6,7 @@
 .Nd yank terminal output to clipboard
 .Sh SYNOPSIS
 .Nm yank
-.Op Fl l | v
+.Op Fl lx | v
 .Op Fl d Ar delim
 .Op Fl - Ar command Op Ar argument ...
 .Sh DESCRIPTION
@@ -47,6 +47,8 @@ as field delimiters
 use only new line and tab characters as field delimiters
 .It Fl v
 prints version
+.It Fl x
+use alternate screen
 .It Fl - Ar command Op Ar argument ...
 use
 .Ar command

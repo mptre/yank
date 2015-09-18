@@ -15,7 +15,9 @@
 #define T_CURSOR_INVISIBLE    "\033[?25l"
 #define T_CURSOR_UP           "\033[%dA"
 #define T_CURSOR_VISIBLE      "\033[?25h"
+#define T_ENTER_CA_MODE       "\033[?1049h"
 #define T_ENTER_STANDOUT_MODE "\033[7m"
+#define T_EXIT_CA_MODE        "\033[?1049l"
 #define T_EXIT_STANDOUT_MODE  "\033[0m"
 
 #define CONTROL(c) (c ^ 0x40)
@@ -40,6 +42,7 @@ static struct {
 static struct {
 	int in;
 	int out;
+	int ca;              /* use alternate screen */
 	unsigned int height;
 	unsigned int width;
 	struct termios attr;
@@ -65,7 +68,7 @@ args(int argc, const char **argv)
 	size_t n;
 	int c, i;
 
-	while ((c = getopt(argc, (char * const *) argv, "lvd:")) != -1) {
+	while ((c = getopt(argc, (char * const *) argv, "lvxd:")) != -1) {
 		switch (c) {
 		case 'd':
 			delim = optarg;
@@ -76,10 +79,13 @@ args(int argc, const char **argv)
 		case 'v':
 			puts("yank " VERSION);
 			exit(0);
+		case 'x':
+			tty.ca = 1;
+			break;
 		default:
 		usage:
 			fputs("usage: yank "
-			      "[-l | -v] "
+			      "[-lx | -v] "
 			      "[-d delim] "
 			      "[-- command [argument ...]]\n", stderr);
 			exit(1);
@@ -321,6 +327,8 @@ tsetup(void)
 	if (!tty.out)
 		perror("open");
 
+	if (tty.ca)
+		tprintf(T_ENTER_CA_MODE);
 	tprintf(T_CURSOR_INVISIBLE);
 }
 
@@ -332,6 +340,8 @@ tend(void)
 	tprintf(T_COLUMN_ADDRESS, 1);
 	tprintf(T_CLR_EOS);
 	tprintf(T_CURSOR_VISIBLE);
+	if (tty.ca)
+		tprintf(T_EXIT_CA_MODE);
 	tcsetattr(tty.in, TCSANOW, &tty.attr);
 	close(tty.in);
 	close(tty.out);
