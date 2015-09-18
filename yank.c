@@ -151,7 +151,7 @@ field(const char *s, int inc, size_t *start, size_t *stop)
 void
 input(void)
 {
-	FILE *f = stdin;
+	int n;
 
 	in.size = BUFSIZ;
 	in.nmemb = 0;
@@ -160,19 +160,20 @@ input(void)
 		perror("malloc");
 
 	for (;;) {
-		in.nmemb += fread(in.v + in.nmemb, 1, in.size - in.nmemb, f);
+		n = read(0, in.v + in.nmemb, in.size - in.nmemb);
+		if (n < 0) {
+			perror("read");
+			break;
+		}
+		if (!n)
+			break;
+		in.nmemb += n;
+
 		if (in.size < in.nmemb + 1) {
 			in.size *= 2;
 			in.v = realloc(in.v, in.size);
 			if (!in.v)
 				perror("realloc");
-		}
-
-		if (feof(f))
-			break;
-		if (ferror(f)) {
-			perror("fread");
-			break;
 		}
 	}
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
