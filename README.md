@@ -54,18 +54,14 @@ Examples
     ```
 
   - If `stdout` is not a terminal the selected field will be written to `stdout`
-    ```
     and exit without invoking the yank command:
-    ```
 
     ```
     yank | cat
     ```
 
   - Yank the selected field to the clipboard as opposed of the default primary
-    ```
     clipboard:
-    ```
 
     ```
     yank -- xsel -b
