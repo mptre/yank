@@ -1,6 +1,5 @@
 #include <fcntl.h>
 #include <getopt.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,7 +57,8 @@ static void yank(void);
 static void tend(void);
 static void tdraw(const char *, size_t, int, int);
 static void tmain(void);
-static void tprintf(const char *, ...);
+static void tprintf(const char *, int);
+static void tputs(const char *);
 static void tsetup(void);
 static void twrite(const char *, size_t);
 
@@ -244,22 +244,27 @@ void
 tdraw(const char *s, size_t nmemb, int start, int stop)
 {
 	twrite(s, start);
-	tprintf(T_ENTER_STANDOUT_MODE);
+	tputs(T_ENTER_STANDOUT_MODE);
 	twrite(s + start, stop - start + 1);
-	tprintf(T_EXIT_STANDOUT_MODE);
+	tputs(T_EXIT_STANDOUT_MODE);
 	twrite(s + stop + 1, nmemb - stop);
 }
 
 void
-tprintf(const char *format, ...)
+tprintf(const char *format, int x)
 {
 	char s[32];
-	va_list args;
 	int n;
 
-	va_start(args, format);
-	n = vsnprintf(s, sizeof(s), format, args);
-	va_end(args);
+	n = snprintf(s, sizeof(s), format, x);
+
+	twrite(s, n);
+}
+
+void
+tputs(const char *s)
+{
+	size_t n = strlen(s);
 
 	twrite(s, n);
 }
@@ -328,8 +333,8 @@ tsetup(void)
 		perror("open");
 
 	if (tty.ca)
-		tprintf(T_ENTER_CA_MODE);
-	tprintf(T_CURSOR_INVISIBLE);
+		tputs(T_ENTER_CA_MODE);
+	tputs(T_CURSOR_INVISIBLE);
 }
 
 void
@@ -338,10 +343,10 @@ tend(void)
 	if (in.nlines)
 		tprintf(T_CURSOR_UP, in.nlines);
 	tprintf(T_COLUMN_ADDRESS, 1);
-	tprintf(T_CLR_EOS);
-	tprintf(T_CURSOR_VISIBLE);
+	tputs(T_CLR_EOS);
+	tputs(T_CURSOR_VISIBLE);
 	if (tty.ca)
-		tprintf(T_EXIT_CA_MODE);
+		tputs(T_EXIT_CA_MODE);
 	tcsetattr(tty.in, TCSANOW, &tty.attr);
 	close(tty.in);
 	close(tty.out);
