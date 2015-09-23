@@ -12,10 +12,11 @@
 .Sh DESCRIPTION
 Read input from
 .Pa stdin
-and draw a selection interface where all fields in the given input is
-recognized by using a given set of delimiters which defaults to space (new line
-and tab characters is always treated as delimiters). The delimiters is a
-sequence of characters represented as a string and can be overwritten using the
+and draw a selection interface where all fields in the given input is recognized
+by using a given set of delimiters, see
+.Em DELIMITERS .
+The delimiters is a sequence of characters represented as a string and can be
+overwritten using the
 .Fl d
 option.
 .Pp
@@ -44,7 +45,8 @@ use all characters in
 .Ar delim
 as field delimiters
 .It Fl l
-use only new line and tab characters as field delimiters
+use the default delimiters expect for space, see
+.Em DELIMITERS
 .It Fl v
 prints version
 .It Fl x
@@ -71,6 +73,21 @@ move selection one field backward
 .It Enter
 exit using the selected field
 .El
+.Sh DELIMITERS
+The following characters are always recognized as delimiters:
+.Bl -tag -width -indent
+.It \en
+new line
+.It \er
+carriage return
+.It \et
+horizontal tab
+.El
+If the
+.Fl d
+and
+.Fl l
+options are omitted space is also recognized as a delimiter.
 .Sh EXAMPLES
 Yank a environment variable key or value:
 .Pp
@@ -78,7 +95,7 @@ Yank a environment variable key or value:
 .Pp
 Yank a field from a CSV file:
 .Pp
-.Dl yank -d '\&",' <file.csv
+.Dl yank -d \e\&", <file.csv
 .Pp
 Yank a whole line using the
 .Fl l

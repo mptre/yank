@@ -190,7 +190,7 @@ isdelim(const char *s)
 {
 	size_t i, n;
 
-	if (*s == '\n' || *s == '\t')
+	if (*s == '\n' || *s == '\r' || *s == '\t')
 		return 1;
 
 	n = rune(s, 0, 1);

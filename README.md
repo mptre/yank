@@ -10,9 +10,9 @@ Description
 
 Read input from `stdin` and draw a selection interface where all fields in the
 given input is recognized by using a given set of delimiters which defaults to
-space (new line and tab characters is always treated as delimiters). The
-delimiters is a sequence of characters represented as a string and can be
-overwritten using the `-d` option.
+space (new line, carriage return and tab characters are always treated as
+delimiters). The delimiters is a sequence of characters represented as a string
+and can be overwritten using the `-d` option.
 
 Using the `Ctrl-N` and `Ctrl-P` keys will move the field selection forward and
 backward. The interface support several Emacs like key bindings, consult the man
