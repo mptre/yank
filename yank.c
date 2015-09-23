@@ -355,7 +355,7 @@ tend(void)
 void
 tmain(void)
 {
-	size_t start, stop;
+	size_t start, stop, t;
 	int c;
 
 	start = stop = 0;
@@ -375,22 +375,24 @@ tmain(void)
 		case CONTROL('D'):
 			return;
 		case CONTROL('A'):
-			start = 0;
+			t = 0;
 		if (0) {
 		case CONTROL('N'):
-			start = stop + rune(in.v, stop, 1);
+			t = stop + rune(in.v, stop, 1);
 		}
-			if (!field(in.v, 1, &start, &stop))
+			if (!field(in.v, 1, &t, &stop))
 				continue;
+			start = t;
 			break;
 		case CONTROL('E'):
-			stop = in.pmemb - 1;
+			t = in.pmemb - 1;
 		if (0) {
 		case CONTROL('P'):
-			stop = start + rune(in.v, start, -1);
+			t = start + rune(in.v, start, -1);
 		}
-			if (!field(in.v, -1, &stop, &start))
+			if (!field(in.v, -1, &t, &start))
 				continue;
+			stop = t;
 			break;
 		default:
 			continue;
