@@ -376,6 +376,7 @@ tmain(void)
 			return;
 		case CONTROL('A'):
 			t = 0;
+			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('N'):
 			t = stop + rune(in.v, stop, 1);
@@ -386,6 +387,7 @@ tmain(void)
 			break;
 		case CONTROL('E'):
 			t = in.pmemb - 1;
+			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('P'):
 			t = start + rune(in.v, start, -1);
