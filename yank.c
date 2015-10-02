@@ -62,6 +62,8 @@ static void tputs(const char *);
 static void tsetup(void);
 static void twrite(const char *, size_t);
 
+static ssize_t xwrite(int, const char *, size_t);
+
 void
 args(int argc, const char **argv)
 {
@@ -211,7 +213,7 @@ yank(void)
 		exit(1);
 
 	if (!isatty(1)) {
-		if (write(1, sel.v, sel.nmemb) < 0)
+		if (xwrite(1, sel.v, sel.nmemb) < 0)
 			perror("write");
 		exit(0);
 	}
@@ -222,7 +224,7 @@ yank(void)
 		perror("dup2");
 	if (close(fd[0]) < 0)
 		perror("close");
-	if (write(fd[1], sel.v, sel.nmemb) < 0)
+	if (xwrite(fd[1], sel.v, sel.nmemb) < 0)
 		perror("write");
 	if (close(fd[1]) < 0)
 		perror("close");
@@ -238,6 +240,23 @@ yank(void)
 	default:
 		waitpid(pid, NULL, 0);
 	}
+}
+
+ssize_t
+xwrite(int fd, const char *s, size_t nmemb)
+{
+	ssize_t r;
+	size_t n = nmemb;
+
+	do {
+		r = write(fd, s, n);
+		if (r < 0)
+			return r;
+		n -= r;
+		s += r;
+	} while (n);
+
+	return nmemb;
 }
 
 void
@@ -272,7 +291,7 @@ tputs(const char *s)
 void
 twrite(const char *s, size_t nmemb)
 {
-	if (write(tty.out, s, nmemb) < 0)
+	if (xwrite(tty.out, s, nmemb) < 0)
 		perror("write");
 }
 
