@@ -21,6 +21,7 @@
 #define T_EXIT_STANDOUT_MODE  "\033[0m"
 
 #define CONTROL(c) (c ^ 0x40)
+#define MIN(x, y) (x < y ? x : y)
 
 static const char *delim = " ";
 
@@ -323,29 +324,26 @@ tsetup(void)
 	}
 
 	s1 = in.v;
-	for (;;) {
+	while (in.pmemb < in.nmemb && in.nlines < tty.height) {
 		s2 = strchr(s1, '\n');
-		if (!s2) {
-			in.pmemb += (in.v + in.nmemb) - s1;
-			break;
+		if (s2) {
+			d = s2 - s1;
+			if (in.nlines < tty.height - 1)
+				s2++;
+		} else {
+			d = MIN((in.v + in.nmemb) - s1,
+				(int) (tty.height - in.nlines)*tty.width);
+			s2 = in.v + in.pmemb + d;
+			if (d < tty.width)
+				/* Invariant: the last line does not contain a
+				 * trailing new line and is shorter than the
+				 * terminal width. Therefor compensate for the
+				 * nlines increment below due to ceiling. */
+				in.nlines--;
 		}
-
-		d = s2 - s1;
-		if (d && !(d % tty.width))
-			/* Invariant: the line length is divisble by the
-			 * terminal width. */
-			in.nlines += d/tty.width;
-		else
-			in.nlines += d/tty.width + 1;
-
-		s2++;
+		in.nlines += d/tty.width + (d % tty.width > 0); /* ceil */
 		in.pmemb += s2 - s1;
 		s1 = s2;
-
-		if (in.nlines == tty.height) {
-			in.pmemb--;
-			break;
-		}
 	}
 	memset(in.v + in.pmemb, 0, in.nmemb - in.pmemb);
 
