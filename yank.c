@@ -375,7 +375,7 @@ void
 tmain(void)
 {
 	size_t start, stop, t;
-	int c;
+	char c;
 
 	start = stop = 0;
 	if (field(in.v, 1, &start, &stop))
@@ -385,7 +385,7 @@ tmain(void)
 	for (;;) {
 		if (read(tty.in, &c, 1) < 0)
 			perror("read");
-		switch (c & 0xFF) {
+		switch (c) {
 		case '\n':
 			sel.nmemb = stop - start + 1;
 			sel.v = in.v + start;
