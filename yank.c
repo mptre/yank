@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -207,6 +208,7 @@ void
 yank(void)
 {
 	int fd[2];
+	int s;
 	pid_t pid;
 
 	if (!sel.v)
@@ -235,10 +237,15 @@ yank(void)
 		exit(1);
 	case 0:
 		execvp(yankargv[0], (char * const *) yankargv);
+		s = errno;
 		perror(yankargv[0]);
-		exit(1);
+		_exit(126 + (s == ENOENT));
 	default:
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &s, 0);
+		if (WIFSIGNALED(s))
+			exit(128 + WTERMSIG(s));
+		if (WIFEXITED(s))
+			exit(WEXITSTATUS(s));
 	}
 }
 
