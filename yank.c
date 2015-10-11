@@ -119,7 +119,7 @@ rune(const char *s, size_t offset, int inc)
 	ssize_t i;
 
 	for (i = offset + inc;
-	     i + inc >= 0 && s[i] && (s[i] & 0xC0) == 0X80;
+	     i + inc >= 0 && s[i] && (s[i] & 0xC0) == 0x80;
 	     i += inc)
 		/* NOP */;
 
