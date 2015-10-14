@@ -10,7 +10,7 @@ yank: yank.c
 	${CC} ${CFLAGS} $^ -o $@ ${LDFLAGS} ${CPPFLAGS}
 
 clean:
-	rm yank
+	rm -f yank
 
 install: yank
 	@echo "yank -> ${PREFIX}/bin/yank"
