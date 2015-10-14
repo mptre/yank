@@ -1,0 +1,6 @@
+{
+  "name": "yank",
+  "repo": "mptre/yank",
+  "version": "v0.4.0",
+  "install": "make install"
+}
