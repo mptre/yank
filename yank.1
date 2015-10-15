@@ -12,13 +12,12 @@
 .Sh DESCRIPTION
 Read input from
 .Pa stdin
-and draw a selection interface where all fields in the given input is recognized
-by using a given set of delimiters, see
-.Em DELIMITERS .
-The delimiters is a sequence of characters represented as a string and can be
-overwritten using the
+and display a selection interface that allows a field to be selected and copied
+to the clipboard. Fields are determined by splitting the input on a delimiter
+sequence, optionally specified using the
 .Fl d
-option.
+option, see
+.Em DELIMITERS .
 .Pp
 Using the
 .Em Ctrl-N

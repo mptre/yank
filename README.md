@@ -8,20 +8,19 @@ Yank terminal output to clipboard.
 Description
 -----------
 
-Read input from `stdin` and draw a selection interface where all fields in the
-given input is recognized by using a given set of delimiters which defaults to
-space (new line, carriage return and tab characters are always treated as
-delimiters). The delimiters is a sequence of characters represented as a string
-and can be overwritten using the `-d` option.
+Read input from `stdin` and display a selection interface that allows a field to
+be selected and copied to the clipboard. Fields are determined by splitting the
+input on a delimiter sequence, optionally specified using the `-d` option. New
+line, carriage return and tab characters are always treated as delimiters.
 
 Using the `Ctrl-N` and `Ctrl-P` keys will move the field selection forward and
-backward. The interface support several Emacs like key bindings, consult the man
-page for further reference. Pressing the return key will invoke the yank command
-and write the selected field to its `stdin`. The yank command defaults to
-xsel[1] but could be anything that accepts input on `stdin`. When invoking yank
-everything supplied after the `--` option will be used as the yank command, see
-examples below. The default yank command can also be defined at compile time,
-see compilation below.
+backward. The interface supports several Emacs like key bindings, consult the
+man page for further reference. Pressing the return key will invoke the yank
+command and write the selected field to its `stdin`. The yank command defaults
+to xsel[1] but could be anything that accepts input on `stdin`. When invoking
+yank everything supplied after the `--` option will be used as the yank command,
+see examples below. The default yank command can also be defined at compile
+time, see compilation below.
 
 Motivation
 ----------
