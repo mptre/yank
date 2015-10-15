@@ -1,8 +1,13 @@
 VERSION = 0.4.0
 
-PREFIX  ?= /usr/local
-YANKCMD ?= xsel
+OS := $(shell uname -s)
+ifeq ($(OS), Darwin)
+  YANKCMD ?= pbcopy
+else
+  YANKCMD ?= xsel
+endif
 
+PREFIX  ?= /usr/local
 CFLAGS   += -Os -pedantic -std=c99 -Wall -Werror -Wextra
 CPPFLAGS += -DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
