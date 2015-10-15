@@ -331,8 +331,8 @@ tsetup(void)
 			if (in.nlines < tty.height - 1)
 				s2++;
 		} else {
-			d = MIN((in.v + in.nmemb) - s1,
-				(int) (tty.height - in.nlines)*tty.width);
+			d = MIN((size_t) ((in.v + in.nmemb) - s1),
+				(tty.height - in.nlines)*tty.width);
 			s2 = in.v + in.pmemb + d;
 			if (d < tty.width)
 				/* Invariant: the last line does not contain a
