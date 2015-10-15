@@ -8,29 +8,28 @@ Yank terminal output to clipboard.
 Description
 -----------
 
-Read input from `stdin` and draw a selection interface where all fields in the
-given input is recognized by using a given set of delimiters which defaults to
-space (new line, carriage return and tab characters are always treated as
-delimiters). The delimiters is a sequence of characters represented as a string
-and can be overwritten using the `-d` option.
+The yank command reads from `stdin` and displays a selection interface that
+allows the user to select a field and copy it to the clipboard.  Fields are
+determined by splitting the input on a delimiter sequence, optionally 
+specified using the `-d` option.  New line, carriage return, and tab characters
+are always treated as delimiters.
 
 Using the `Ctrl-N` and `Ctrl-P` keys will move the field selection forward and
-backward. The interface support several Emacs like key bindings, consult the man
-page for further reference. Pressing the return key will invoke the yank command
-and write the selected field to its `stdin`. The yank command defaults to
-xsel[1] but could be anything that accepts input on `stdin`. When invoking yank
-everything supplied after the `--` option will be used as the yank command, see
-examples below. The default yank command can also be defined at compile time,
-see compilation below.
+backward. The interface supports several Emacs like key bindings, consult the
+man page for more information. Pressing the return key will invoke the yank 
+command and write the selected field to its `stdin`. The yank command defaults 
+to xsel[1] but can use anything that accepts input on `stdin`. When invoking 
+yank everything supplied after the `--` option will be used as the yank 
+command, as shown in the examples below. The default yank command can also be
+specified at compile time, as explained in the compilation section below.
 
 Motivation
 ----------
 
-Others including myself consider it a cache miss when resort to using the mouse.
-Copying output from the terminal is still one of the few cases where I still use
-the mouse. Several terminal multiplexers solves this issue, however I don't want
-to be required to use a multiplexer but instead use a terminal agnostic
-solution.
+Some people consider it a cache miss when they need to use their mouse.  Copying
+output from the terminal is one situation where many people still need to use
+the mouse.  Several terminal multiplexers solve this issue, but a terminal 
+agnostic solution is preferable.
 
 Examples
 --------
