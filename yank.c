@@ -21,6 +21,7 @@
 #define T_EXIT_STANDOUT_MODE  "\033[0m"
 
 #define CONTROL(c) (c ^ 0x40)
+#define MAX(x, y) (x > y ? x : y)
 #define MIN(x, y) (x < y ? x : y)
 
 static const char *delim = " ";
@@ -327,7 +328,7 @@ tsetup(void)
 	while (in.pmemb < in.nmemb && in.nlines < tty.height) {
 		s2 = strchr(s1, '\n');
 		if (s2) {
-			d = s2 - s1;
+			d = MAX(s2 - s1, 1);
 			if (in.nlines < tty.height - 1)
 				s2++;
 		} else {
