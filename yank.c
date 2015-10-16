@@ -23,6 +23,9 @@
 #define CONTROL(c) (c ^ 0x40)
 #define MIN(x, y) (x < y ? x : y)
 
+#define NEXT CONTROL('N')
+#define PREV CONTROL('P')
+
 static const char *delim = " ";
 
 static const char **yankargv;
@@ -402,7 +405,7 @@ tmain(void)
 			t = 0;
 			/* FALLTHROUGH */
 		if (0) {
-		case CONTROL('N'):
+		case NEXT:
 			t = stop + rune(in.v, stop, 1);
 		}
 			if (!field(in.v, 1, &t, &stop))
@@ -413,7 +416,7 @@ tmain(void)
 			t = in.pmemb - 1;
 			/* FALLTHROUGH */
 		if (0) {
-		case CONTROL('P'):
+		case PREV:
 			t = start + rune(in.v, start, -1);
 		}
 			if (!field(in.v, -1, &t, &start))
