@@ -20,6 +20,11 @@
 #define T_EXIT_CA_MODE        "\033[?1049l"
 #define T_EXIT_STANDOUT_MODE  "\033[0m"
 
+#define ESC 27
+#define ARROW_PREFIX 91
+#define LEFT_ARROW 68
+#define RIGHT_ARROW 67
+
 #define CONTROL(c) (c ^ 0x40)
 #define MIN(x, y) (x < y ? x : y)
 
@@ -379,12 +384,34 @@ tend(void)
 	close(tty.out);
 }
 
+/* Transfroms the escape sequence into actions' default keycode. */
+void
+trans_esc_seq(char *out) {
+	char esc_seq[2];
+	if (read(tty.in, esc_seq, 2) < 0) {
+		perror("read");
+		return;
+	}
+			
+	if (esc_seq[0] != ARROW_PREFIX)  {
+		return;
+	}
+
+	switch(esc_seq[1]) {
+		case LEFT_ARROW:
+			*out = PREV;
+			break;
+		case RIGHT_ARROW:
+			*out = NEXT;
+			break;
+	}
+}
+
 void
 tmain(void)
 {
 	size_t start, stop, t;
 	char c;
-
 	start = stop = 0;
 	if (field(in.v, 1, &start, &stop))
 		tdraw(in.v, in.pmemb, start, stop);
@@ -393,6 +420,10 @@ tmain(void)
 	for (;;) {
 		if (read(tty.in, &c, 1) < 0)
 			perror("read");
+
+		if (c == ESC)
+			trans_esc_seq(&c);
+
 		switch (c) {
 		case '\n':
 			sel.nmemb = stop - start + 1;
