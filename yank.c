@@ -9,9 +9,13 @@
 #include <termios.h>
 #include <unistd.h>
 
+#define KEY_DOWN  0x100
+#define KEY_LEFT  0x101
+#define KEY_RIGHT 0x102
+#define KEY_UP    0x103
+
 /* Terminal capabilities */
 #define T_CLR_EOS             "\033[J"
-#define T_COLUMN_ADDRESS      "\033[%dG"
 #define T_CURSOR_INVISIBLE    "\033[?25l"
 #define T_CURSOR_UP           "\033[%dA"
 #define T_CURSOR_VISIBLE      "\033[?25h"
@@ -19,9 +23,14 @@
 #define T_ENTER_STANDOUT_MODE "\033[7m"
 #define T_EXIT_CA_MODE        "\033[?1049l"
 #define T_EXIT_STANDOUT_MODE  "\033[0m"
+#define T_KEY_DOWN            "\033[B"
+#define T_KEY_LEFT            "\033[D"
+#define T_KEY_RIGHT           "\033[C"
+#define T_KEY_UP              "\033[A"
+#define T_RESTORE_CURSOR      "\033[u"
+#define T_SAVE_CURSOR         "\033[s"
 
 #define CONTROL(c) (c ^ 0x40)
-#define MAX(x, y) (x > y ? x : y)
 #define MIN(x, y) (x < y ? x : y)
 
 static const char *delim = " ";
@@ -31,10 +40,14 @@ static const char **yankargv;
 static struct {
 	size_t size;
 	size_t nmemb;
-	size_t pmemb;  /* number of bytes that fits on screen */
-	size_t nlines;
 	char *v;
 } in;
+
+static struct {
+	size_t size;
+	size_t nmemb;
+	size_t *v;
+} lines;
 
 static struct {
 	size_t nmemb;
@@ -53,15 +66,18 @@ static struct {
 static void args(int, const char **);
 static int field(const char *, int, size_t *, size_t *);
 static void input(void);
+static int intersect(int, int, int, int);
 static int isdelim(const char *);
 static ssize_t rune(const char *s, size_t, int);
 static void yank(void);
 
-static void tend(void);
 static void tdraw(const char *, size_t, int, int);
+static void tend(void);
+static int tgetc(void);
 static void tmain(void);
 static void tprintf(const char *, int);
 static void tputs(const char *);
+static void treset(void);
 static void tsetup(void);
 static void twrite(const char *, size_t);
 
@@ -190,6 +206,27 @@ input(void)
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
 }
 
+/*
+ * Returns nonzero if [x1, x2] and [y1, y2] intersects.
+ */
+int
+intersect(int x1, int y1, int x2, int y2)
+{
+	int m;
+
+	while (x1 <= y1) {
+		m = x1 + (y1 - x1)/2;
+		if (x2 <= m && m <= y2)
+			return 1;
+		if (m < x2)
+			x1 = m + 1;
+		else
+			y1 = m - 1;
+	}
+
+	return 0;
+}
+
 int
 isdelim(const char *s)
 {
@@ -310,7 +347,7 @@ tsetup(void)
 	struct termios attr;
 	struct winsize ws;
 	char *s1, *s2;
-	size_t d;
+	size_t d, n;
 
 	tty.in = open("/dev/tty", O_RDONLY);
 	if (!tty.in)
@@ -324,29 +361,34 @@ tsetup(void)
 		tty.width = ws.ws_col;
 	}
 
+	lines.size = tty.height + 1;
+	lines.v = calloc(lines.size, sizeof(size_t));
+	if (!lines.v)
+		perror("calloc");
+	lines.v[lines.nmemb++] = 0;
+	n = MIN(tty.height*tty.width, in.nmemb);
 	s1 = in.v;
-	while (in.pmemb < in.nmemb && in.nlines < tty.height) {
-		s2 = strchr(s1, '\n');
-		if (s2) {
-			d = MAX(s2 - s1, 1);
-			if (in.nlines < tty.height - 1)
-				s2++;
-		} else {
-			d = MIN((size_t) ((in.v + in.nmemb) - s1),
-				(tty.height - in.nlines)*tty.width);
-			s2 = in.v + in.pmemb + d;
-			if (d < tty.width)
-				/* Invariant: the last line does not contain a
-				 * trailing new line and is shorter than the
-				 * terminal width. Therefor compensate for the
-				 * nlines increment below due to ceiling. */
-				in.nlines--;
+	s2 = NULL;
+	while (lines.v[lines.nmemb] < in.nmemb && lines.nmemb < lines.size) {
+		if (!s2) {
+			s2 = memchr(s1, '\n', n);
+			if (s2) {
+				if (lines.size - lines.nmemb > 1)
+					s2++;
+			} else {
+				s2 = in.v + in.nmemb;
+			}
 		}
-		in.nlines += d/tty.width + (d % tty.width > 0); /* ceil */
-		in.pmemb += s2 - s1;
-		s1 = s2;
+
+		d = MIN(s2 - s1, tty.width);
+		lines.v[lines.nmemb++] += d;
+		lines.v[lines.nmemb] = lines.v[lines.nmemb - 1];
+		n -= d;
+		s1 += d;
+		if (s1 == s2)
+			s2 = NULL;
 	}
-	memset(in.v + in.pmemb, 0, in.nmemb - in.pmemb);
+	memset(in.v + lines.v[lines.nmemb], 0, in.nmemb - lines.v[lines.nmemb]);
 
 	tcgetattr(tty.in, &tty.attr);
 	memcpy(&attr, &tty.attr, sizeof(struct termios));
@@ -360,14 +402,17 @@ tsetup(void)
 	if (tty.ca)
 		tputs(T_ENTER_CA_MODE);
 	tputs(T_CURSOR_INVISIBLE);
+	/* Emit the number of lines and save the cursor position. */
+	for (n = 0; n < lines.nmemb; n++)
+		tputs("\n");
+	tputs(T_SAVE_CURSOR);
+	treset();
 }
 
 void
 tend(void)
 {
-	if (in.nlines)
-		tprintf(T_CURSOR_UP, in.nlines);
-	tprintf(T_COLUMN_ADDRESS, 1);
+	treset();
 	tputs(T_CLR_EOS);
 	tputs(T_CURSOR_VISIBLE);
 	if (tty.ca)
@@ -378,19 +423,51 @@ tend(void)
 }
 
 void
+treset(void)
+{
+	tputs(T_RESTORE_CURSOR);
+	tprintf(T_CURSOR_UP, lines.nmemb);
+}
+
+int
+tgetc(void)
+{
+	char buf[3];
+	ssize_t n;
+
+	n = read(tty.in, buf, sizeof(buf));
+	if (n < 0) {
+		perror("read");
+		return 0;
+	}
+	if (n > 2) {
+		if (!strncmp(T_KEY_UP, buf, n))
+			return KEY_UP;
+		if (!strncmp(T_KEY_RIGHT, buf, n))
+			return KEY_RIGHT;
+		if (!strncmp(T_KEY_DOWN, buf, n))
+			return KEY_DOWN;
+		if (!strncmp(T_KEY_LEFT, buf, n))
+			return KEY_LEFT;
+		return 0;
+	}
+
+	return buf[0];
+}
+
+void
 tmain(void)
 {
-	size_t start, stop, t;
-	char c;
+	size_t d, start, stop, s, t, x, y;
+	int c, i;
 
 	start = stop = 0;
 	if (field(in.v, 1, &start, &stop))
-		tdraw(in.v, in.pmemb, start, stop);
+		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
 	else
-		twrite(in.v, in.pmemb);
+		twrite(in.v, lines.v[lines.nmemb - 1]);
 	for (;;) {
-		if (read(tty.in, &c, 1) < 0)
-			perror("read");
+		c = tgetc();
 		switch (c) {
 		case '\n':
 			sel.nmemb = stop - start + 1;
@@ -404,6 +481,7 @@ tmain(void)
 			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('N'):
+		case KEY_RIGHT:
 			t = stop + rune(in.v, stop, 1);
 		}
 			if (!field(in.v, 1, &t, &stop))
@@ -411,23 +489,73 @@ tmain(void)
 			start = t;
 			break;
 		case CONTROL('E'):
-			t = in.pmemb - 1;
+			t = lines.v[lines.nmemb - 1] - 1;
 			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('P'):
+		case KEY_LEFT:
 			t = start + rune(in.v, start, -1);
 		}
 			if (!field(in.v, -1, &t, &start))
 				continue;
 			stop = t;
 			break;
+		case KEY_DOWN:
+			i = 0;
+			while (lines.v[i + 1] <= stop)
+				i++;
+
+			d = lines.v[i];
+			s = lines.v[++i];
+			if (!field(in.v, 1, &s, &t))
+				continue;
+			while (lines.v[i] < s)
+				i++;
+			for (;;) {
+				if (intersect(start - d, stop - d,
+					      s - lines.v[i], t - lines.v[i]))
+					break;
+
+				x = t + rune(in.v, t, 1);
+				if (!field(in.v, 1, &x, &y)
+				    || y >= lines.v[i + 1])
+					break;
+				s = x;
+				t = y;
+			}
+			start = s;
+			stop = t;
+			break;
+		case KEY_UP:
+			i = 0;
+			while (lines.v[i + 1] <= start)
+				i++;
+
+			d = t = lines.v[i];
+			t += rune(in.v, t, -1);
+			if (!field(in.v, -1, &t, &s))
+				continue;
+			while (lines.v[i] > s)
+				i--;
+			for (;;) {
+				if (intersect(start - d, stop - d,
+					      s - lines.v[i], t - lines.v[i]))
+				    break;
+
+				x = s + rune(in.v, s, -1);
+				if (!field(in.v, -1, &x, &y) || x <= lines.v[i])
+					break;
+				s = y;
+				t = x;
+			}
+			start = s;
+			stop = t;
+			break;
 		default:
 			continue;
 		}
-		if (in.nlines)
-			tprintf(T_CURSOR_UP, in.nlines);
-		tprintf(T_COLUMN_ADDRESS, 1);
-		tdraw(in.v, in.pmemb, start, stop);
+		treset();
+		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
 	}
 }
 
