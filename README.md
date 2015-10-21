@@ -90,13 +90,11 @@ Installation
 
 ### OS X
 
-Install using `brew`:
-
 ```
 brew install yank
 ```
 
-### Manual
+### From source
 
 The install directory defaults to `/usr/local`:
 
