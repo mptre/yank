@@ -88,6 +88,16 @@ file.
 Installation
 ------------
 
+### OS X
+
+Install using `brew`:
+
+```
+brew install yank
+```
+
+### Manual
+
 The install directory defaults to `/usr/local`:
 
   ```
