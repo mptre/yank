@@ -70,7 +70,6 @@ static ssize_t xwrite(int, const char *, size_t);
 void
 args(int argc, const char **argv)
 {
-	size_t n;
 	int c, i;
 
 	while ((c = getopt(argc, (char * const *) argv, "lvxd:")) != -1) {
@@ -100,11 +99,9 @@ args(int argc, const char **argv)
 		goto usage;
 
 	/* Ensure space for yank command and null terminator. */
-	n = (argc - optind + 2)*sizeof(const char *);
-	yankargv = malloc(n);
+	yankargv = calloc(argc - optind + 2, sizeof(const char *));
 	if (!yankargv)
 		perror("malloc");
-	memset(yankargv, 0, n);
 	yankargv[0] = YANKCMD;
 	for (i = optind; i < argc; i++)
 		yankargv[i - optind] = argv[i];
