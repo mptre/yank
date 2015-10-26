@@ -88,6 +88,16 @@ file.
 Installation
 ------------
 
+### Debian
+
+On testing and unstable, yank can be installed by simply running:
+
+  ```
+  sudo apt-get install yank
+  ```
+
+The binary itself is installed as /usr/bin/yank-cli due to a naming conflict
+
 ### OS X
 
   ```
