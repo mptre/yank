@@ -101,7 +101,7 @@ args(int argc, const char **argv)
 	/* Ensure space for yank command and null terminator. */
 	yankargv = calloc(argc - optind + 2, sizeof(const char *));
 	if (!yankargv)
-		perror("malloc");
+		perror("calloc");
 	yankargv[0] = YANKCMD;
 	for (i = optind; i < argc; i++)
 		yankargv[i - optind] = argv[i];
