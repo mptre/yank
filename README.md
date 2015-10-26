@@ -88,6 +88,16 @@ file.
 Installation
 ------------
 
+### Debian
+
+On testing and unstable:
+
+  ```
+  sudo apt-get install yank
+  ```
+
+The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
+
 ### OS X
 
   ```
