@@ -108,4 +108,23 @@ Change the install directory using the `PREFIX` environment variable:
   PREFIX=DIR make install
   ```
 
+Debian-specific notes
+---------------------
+
+On Debian testing and unstable, yank can be installed by simply
+running:
+
+  ```
+  sudo apt-get install yank
+  ```
+
+The binary itself is installed as /usr/bin/yank-cli (/usr/bin/yank is
+already part of another package), but you can alias yank-cli to
+something shorter, as it's meant to be a command to quickly insert
+anywhere on the command line; for instance:
+
+  ```
+  alias y=/usr/bin/yank-cli
+  ```
+
 [1] http://www.vergenet.net/~conrad/software/xsel/
