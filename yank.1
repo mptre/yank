@@ -106,9 +106,9 @@ If
 .Pa stdout
 is not a terminal the selected field will be written to
 .Pa stdout
-and exit without invoking the yank command:
+and exit without invoking the yank command. Kill the selected PID:
 .Pp
-.Dl yank | cat
+.Dl ps ux | yank | xargs kill
 .Pp
 Yank the selected field to the clipboard as opposed of the default primary
 clipboard:
