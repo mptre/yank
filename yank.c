@@ -64,7 +64,7 @@ static struct {
 } tty;
 
 static void args(int, const char **);
-static int field(const char *, int, size_t *, size_t *);
+static int field(const char *, size_t, int, size_t *, size_t *);
 static void input(void);
 static int intersect(int, int, int, int);
 static int isdelim(const char *);
@@ -143,13 +143,17 @@ rune(const char *s, size_t offset, int inc)
 	return i - offset;
 }
 
+/*
+ * Writes the next field to start and stop relative to s + offset in the
+ * direction given by inc.
+ */
 int
-field(const char *s, int inc, size_t *start, size_t *stop)
+field(const char *s, size_t offset, int inc, size_t *start, size_t *stop)
 {
 	ssize_t i, j, r;
 
 	r = 0;
-	i = *start;
+	i = offset;
 	for (;;) {
 		if (i < 0 || !s[i])
 			return 0;
@@ -455,11 +459,10 @@ tgetc(void)
 void
 tmain(void)
 {
-	size_t d, start, stop, s, t, x, y;
+	size_t d, o, start, stop, s, t, x, y;
 	int c, i;
 
-	start = stop = 0;
-	if (field(in.v, 1, &start, &stop))
+	if (field(in.v, 0, 1, &start, &stop))
 		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
 	else
 		twrite(in.v, lines.v[lines.nmemb - 1]);
@@ -474,28 +477,26 @@ tmain(void)
 		case CONTROL('D'):
 			return;
 		case CONTROL('A'):
-			t = 0;
+			o = 0;
 			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('N'):
 		case KEY_RIGHT:
-			t = stop + rune(in.v, stop, 1);
+			o = stop + rune(in.v, stop, 1);
 		}
-			if (!field(in.v, 1, &t, &stop))
+			if (!field(in.v, o, 1, &start, &stop))
 				continue;
-			start = t;
 			break;
 		case CONTROL('E'):
-			t = lines.v[lines.nmemb - 1] - 1;
+			o = lines.v[lines.nmemb - 1] - 1;
 			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('P'):
 		case KEY_LEFT:
-			t = start + rune(in.v, start, -1);
+			o = start + rune(in.v, start, -1);
 		}
-			if (!field(in.v, -1, &t, &start))
+			if (!field(in.v, o, -1, &stop, &start))
 				continue;
-			stop = t;
 			break;
 		case KEY_DOWN:
 			i = 0;
@@ -503,8 +504,8 @@ tmain(void)
 				i++;
 
 			d = lines.v[i];
-			s = lines.v[++i];
-			if (!field(in.v, 1, &s, &t))
+			o = lines.v[++i];
+			if (!field(in.v, o, 1, &s, &t))
 				continue;
 			while (lines.v[i] < s)
 				i++;
@@ -513,8 +514,8 @@ tmain(void)
 					      s - lines.v[i], t - lines.v[i]))
 					break;
 
-				x = t + rune(in.v, t, 1);
-				if (!field(in.v, 1, &x, &y)
+				o = t + rune(in.v, t, 1);
+				if (!field(in.v, o, 1, &x, &y)
 				    || y >= lines.v[i + 1])
 					break;
 				s = x;
@@ -528,9 +529,9 @@ tmain(void)
 			while (lines.v[i + 1] <= start)
 				i++;
 
-			d = t = lines.v[i];
-			t += rune(in.v, t, -1);
-			if (!field(in.v, -1, &t, &s))
+			d = o = lines.v[i];
+			o += rune(in.v, o, -1);
+			if (!field(in.v, o, -1, &t, &s))
 				continue;
 			while (lines.v[i] > s)
 				i--;
@@ -539,11 +540,12 @@ tmain(void)
 					      s - lines.v[i], t - lines.v[i]))
 				    break;
 
-				x = s + rune(in.v, s, -1);
-				if (!field(in.v, -1, &x, &y) || x <= lines.v[i])
+				o = s + rune(in.v, s, -1);
+				if (!field(in.v, o, -1, &y, &x)
+				    || y <= lines.v[i])
 					break;
-				s = y;
-				t = x;
+				s = x;
+				t = y;
 			}
 			start = s;
 			stop = t;
