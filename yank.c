@@ -367,10 +367,9 @@ tsetup(void)
 		perror("calloc");
 	lines.v[lines.nmemb++] = 0;
 	n = MIN(tty.height*tty.width, in.nmemb);
-	s1 = in.v;
-	s2 = NULL;
+	s1 = s2 = in.v;
 	while (lines.v[lines.nmemb] < in.nmemb && lines.nmemb < lines.size) {
-		if (!s2) {
+		if (s1 == s2) {
 			s2 = memchr(s1, '\n', n);
 			if (s2) {
 				if (lines.size - lines.nmemb > 1)
@@ -385,8 +384,6 @@ tsetup(void)
 		lines.v[lines.nmemb] = lines.v[lines.nmemb - 1];
 		n -= d;
 		s1 += d;
-		if (s1 == s2)
-			s2 = NULL;
 	}
 	memset(in.v + lines.v[lines.nmemb], 0, in.nmemb - lines.v[lines.nmemb]);
 
