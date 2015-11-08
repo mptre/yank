@@ -162,7 +162,6 @@ input(void)
 	int n;
 
 	in.size = BUFSIZ;
-	in.nmemb = 0;
 	in.v = malloc(in.size);
 	if (!in.v)
 		perror("malloc");
