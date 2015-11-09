@@ -502,50 +502,36 @@ tmain(void)
 			i = 0;
 			while (lines.v[i + 1] <= stop)
 				i++;
-
 			d = lines.v[i];
 			o = lines.v[++i];
 			if (!field(in.v, o, 1, &s, &t))
 				continue;
 			while (lines.v[i] < s)
 				i++;
-			for (;;) {
-				if (intersect(start - d, stop - d,
-					      s - lines.v[i], t - lines.v[i]))
-					break;
-
-				o = t + rune(in.v, t, 1);
-				if (!field(in.v, o, 1, &x, &y)
-				    || y >= lines.v[i + 1])
-					break;
-				s = x;
-				t = y;
-			}
-			start = s;
-			stop = t;
-			break;
+		if (0) {
 		case KEY_UP:
 			i = 0;
 			while (lines.v[i + 1] <= start)
 				i++;
-
 			d = o = lines.v[i];
 			o += rune(in.v, o, -1);
 			if (!field(in.v, o, -1, &t, &s))
 				continue;
 			while (lines.v[i] > s)
 				i--;
+		}
+			o = lines.v[i];
 			for (;;) {
-				if (intersect(start - d, stop - d,
-					      s - lines.v[i], t - lines.v[i]))
-				    break;
-
-				o = s + rune(in.v, s, -1);
-				if (!field(in.v, o, -1, &y, &x)
-				    || y <= lines.v[i])
+				if (!field(in.v, o, 1, &x, &y)
+				    || y >= lines.v[i + 1])
 					break;
+
 				s = x;
 				t = y;
+				if (intersect(start - d, stop - d,
+					      s - lines.v[i], t - lines.v[i]))
+					break;
+				o = t + rune(in.v, t, 1);
 			}
 			start = s;
 			stop = t;
