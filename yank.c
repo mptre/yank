@@ -64,7 +64,7 @@ static struct {
 } tty;
 
 static void args(int, const char **);
-static int field(const char *, size_t, int, size_t *, size_t *);
+static int field(const char *, size_t, size_t, int, size_t *, size_t *);
 static void input(void);
 static int intersect(int, int, int, int);
 static int isdelim(const char *);
@@ -145,17 +145,18 @@ rune(const char *s, size_t offset, int inc)
 
 /*
  * Writes the next field to start and stop relative to s + offset in the
- * direction given by inc.
+ * direction given by inc by examen at most nmemb-1 bytes of s.
  */
 int
-field(const char *s, size_t offset, int inc, size_t *start, size_t *stop)
+field(const char *s, size_t nmemb, size_t offset, int inc,
+      size_t *start, size_t *stop)
 {
 	ssize_t i, j, r;
 
 	r = 0;
 	i = offset;
 	for (;;) {
-		if (i < 0 || !s[i])
+		if (i < 0 || i >= (ssize_t) nmemb)
 			return 0;
 
 		if (!isdelim(&s[i]))
@@ -169,7 +170,7 @@ field(const char *s, size_t offset, int inc, size_t *start, size_t *stop)
 	for (;;) {
 		r = rune(s, j, inc);
 		j += r;
-		if (j < 0 || !s[j] || isdelim(&s[j]))
+		if (j < 0 || j >= (ssize_t) nmemb || isdelim(&s[j]))
 			break;
 	}
 	j -= r < -1 ? r : inc;
@@ -459,13 +460,14 @@ tgetc(void)
 void
 tmain(void)
 {
-	size_t d, o, start, stop, s, t, x, y;
+	size_t d, n, o, start, stop, s, t;
 	int c, i;
 
-	if (field(in.v, 0, 1, &start, &stop))
-		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
+	n = lines.v[lines.nmemb - 1];
+	if (field(in.v, n, 0, 1, &start, &stop))
+		tdraw(in.v, n, start, stop);
 	else
-		twrite(in.v, lines.v[lines.nmemb - 1]);
+		twrite(in.v, n);
 	for (;;) {
 		c = tgetc();
 		switch (c) {
@@ -484,18 +486,18 @@ tmain(void)
 		case KEY_RIGHT:
 			o = stop + rune(in.v, stop, 1);
 		}
-			if (!field(in.v, o, 1, &start, &stop))
+			if (!field(in.v, n, o, 1, &start, &stop))
 				continue;
 			break;
 		case CONTROL('E'):
-			o = lines.v[lines.nmemb - 1] - 1;
+			o = n - 1;
 			/* FALLTHROUGH */
 		if (0) {
 		case CONTROL('P'):
 		case KEY_LEFT:
 			o = start + rune(in.v, start, -1);
 		}
-			if (!field(in.v, o, -1, &stop, &start))
+			if (!field(in.v, n, o, -1, &stop, &start))
 				continue;
 			break;
 		case KEY_DOWN:
@@ -504,10 +506,11 @@ tmain(void)
 				i++;
 			d = lines.v[i];
 			o = lines.v[++i];
-			if (!field(in.v, o, 1, &s, &t))
+			if (!field(in.v, n, o, 1, &s, &t))
 				continue;
 			while (lines.v[i] < s)
 				i++;
+			/* FALLTHROUGH */
 		if (0) {
 		case KEY_UP:
 			i = 0;
@@ -515,19 +518,15 @@ tmain(void)
 				i++;
 			d = o = lines.v[i];
 			o += rune(in.v, o, -1);
-			if (!field(in.v, o, -1, &t, &s))
+			if (!field(in.v, n, o, -1, &t, &s))
 				continue;
 			while (lines.v[i] > s)
 				i--;
 		}
 			o = lines.v[i];
 			for (;;) {
-				if (!field(in.v, o, 1, &x, &y)
-				    || y >= lines.v[i + 1])
+				if (!field(in.v, lines.v[i + 1], o, 1, &s, &t))
 					break;
-
-				s = x;
-				t = y;
 				if (intersect(start - d, stop - d,
 					      s - lines.v[i], t - lines.v[i]))
 					break;
@@ -540,7 +539,7 @@ tmain(void)
 			continue;
 		}
 		treset();
-		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
+		tdraw(in.v, n, start, stop);
 	}
 }
 
