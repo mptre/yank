@@ -31,7 +31,7 @@
 #define T_SAVE_CURSOR         "\033[s"
 
 #define CONTROL(c) (c ^ 0x40)
-#define MIN(x, y) (x < y ? x : y)
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 static const char *delim = " ";
 
