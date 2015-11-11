@@ -359,7 +359,7 @@ tsetup(void)
 	lines.v[lines.nmemb++] = 0;
 	n = MIN(tty.height*tty.width, in.nmemb);
 	s1 = s2 = in.v;
-	while (lines.v[lines.nmemb] < in.nmemb && lines.nmemb < lines.size) {
+	while (n && lines.nmemb < lines.size) {
 		if (s1 == s2) {
 			s2 = memchr(s1, '\n', n);
 			if (s2) {
