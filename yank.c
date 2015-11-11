@@ -488,7 +488,7 @@ tmain(void)
 			o = lines.v[++i];
 			if (!field(in.v, n, o, 1, &s, &t))
 				continue;
-			while (lines.v[i] < s)
+			while (s < lines.v[i])
 				i++;
 			/* FALLTHROUGH */
 		if (0) {
