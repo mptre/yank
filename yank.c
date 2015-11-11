@@ -17,7 +17,6 @@
 /* Terminal capabilities */
 #define T_CLR_EOS             "\033[J"
 #define T_CURSOR_INVISIBLE    "\033[?25l"
-#define T_CURSOR_UP           "\033[%dA"
 #define T_CURSOR_VISIBLE      "\033[?25h"
 #define T_ENTER_CA_MODE       "\033[?1049h"
 #define T_ENTER_STANDOUT_MODE "\033[7m"
@@ -75,9 +74,7 @@ static void tdraw(const char *, size_t, int, int);
 static void tend(void);
 static int tgetc(void);
 static void tmain(void);
-static void tprintf(const char *, int);
 static void tputs(const char *);
-static void treset(void);
 static void tsetup(void);
 static void twrite(const char *, size_t);
 
@@ -321,17 +318,6 @@ tdraw(const char *s, size_t nmemb, int start, int stop)
 }
 
 void
-tprintf(const char *format, int x)
-{
-	char s[32];
-	int n;
-
-	n = snprintf(s, sizeof(s), format, x);
-
-	twrite(s, n);
-}
-
-void
 tputs(const char *s)
 {
 	size_t n = strlen(s);
@@ -407,14 +393,15 @@ tsetup(void)
 	/* Emit the number of lines and save the cursor position. */
 	for (n = 0; n < lines.nmemb; n++)
 		tputs("\n");
+	for (n = 0; n < lines.nmemb; n++)
+		tputs(T_KEY_UP);
 	tputs(T_SAVE_CURSOR);
-	treset();
 }
 
 void
 tend(void)
 {
-	treset();
+	tputs(T_RESTORE_CURSOR);
 	tputs(T_CLR_EOS);
 	tputs(T_CURSOR_VISIBLE);
 	if (tty.ca)
@@ -422,13 +409,6 @@ tend(void)
 	tcsetattr(tty.in, TCSANOW, &tty.attr);
 	close(tty.in);
 	close(tty.out);
-}
-
-void
-treset(void)
-{
-	tputs(T_RESTORE_CURSOR);
-	tprintf(T_CURSOR_UP, lines.nmemb);
 }
 
 int
@@ -538,7 +518,7 @@ tmain(void)
 		default:
 			continue;
 		}
-		treset();
+		tputs(T_RESTORE_CURSOR);
 		tdraw(in.v, n, start, stop);
 	}
 }
