@@ -506,7 +506,6 @@ tmain(void)
 				if (!field(in.v, o, 1, &x, &y)
 				    || y >= lines.v[i + 1])
 					break;
-
 				s = x;
 				t = y;
 				if (intersect(start - d, stop - d,
