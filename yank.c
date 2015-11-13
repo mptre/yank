@@ -57,8 +57,6 @@ static struct {
 	int in;
 	int out;
 	int ca;              /* use alternate screen */
-	unsigned int height;
-	unsigned int width;
 	struct termios attr;
 } tty;
 
@@ -338,21 +336,17 @@ tsetup(void)
 	tty.in = open("/dev/tty", O_RDONLY);
 	if (!tty.in)
 		perror("open");
-	if (ioctl(tty.in, TIOCGWINSZ, &ws) < 0) {
-		perror("ioctl");
-		tty.height = 24;
-		tty.width = 80;
-	} else {
-		tty.height = ws.ws_row;
-		tty.width = ws.ws_col;
-	}
 
-	lines.size = tty.height + 1;
+	ws.ws_col = 80, ws.ws_row = 24;
+	if (ioctl(tty.in, TIOCGWINSZ, &ws) < 0)
+		perror("ioctl");
+
+	lines.size = ws.ws_row + 1;
 	lines.v = calloc(lines.size, sizeof(size_t));
 	if (!lines.v)
 		perror("calloc");
 	lines.v[lines.nmemb++] = 0;
-	n = MIN(tty.height*tty.width, in.nmemb);
+	n = MIN(ws.ws_col*ws.ws_row, in.nmemb);
 	s1 = s2 = in.v;
 	while (n && lines.nmemb < lines.size) {
 		if (s1 == s2) {
@@ -365,7 +359,7 @@ tsetup(void)
 			}
 		}
 
-		d = MIN(s2 - s1, tty.width);
+		d = MIN(s2 - s1, ws.ws_col);
 		lines.v[lines.nmemb++] += d;
 		lines.v[lines.nmemb] = lines.v[lines.nmemb - 1];
 		n -= d;
