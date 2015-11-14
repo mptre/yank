@@ -54,8 +54,8 @@ static struct {
 } sel;
 
 static struct {
-	int in;
-	int out;
+	int rfd;
+	int wfd;
 	int ca;              /* use alternate screen */
 	struct termios attr;
 } tty;
@@ -321,7 +321,7 @@ tputs(const char *s)
 void
 twrite(const char *s, size_t nmemb)
 {
-	if (xwrite(tty.out, s, nmemb) < 0)
+	if (xwrite(tty.wfd, s, nmemb) < 0)
 		perror("write");
 }
 
@@ -333,12 +333,12 @@ tsetup(void)
 	char *s1, *s2;
 	size_t d, n;
 
-	tty.in = open("/dev/tty", O_RDONLY);
-	if (!tty.in)
+	tty.rfd = open("/dev/tty", O_RDONLY);
+	if (!tty.rfd)
 		perror("open");
 
 	ws.ws_col = 80, ws.ws_row = 24;
-	if (ioctl(tty.in, TIOCGWINSZ, &ws) < 0)
+	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) < 0)
 		perror("ioctl");
 
 	lines.size = ws.ws_row + 1;
@@ -367,13 +367,13 @@ tsetup(void)
 	}
 	memset(in.v + lines.v[lines.nmemb], 0, in.nmemb - lines.v[lines.nmemb]);
 
-	tcgetattr(tty.in, &tty.attr);
+	tcgetattr(tty.rfd, &tty.attr);
 	memcpy(&attr, &tty.attr, sizeof(struct termios));
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
-	tcsetattr(tty.in, TCSANOW, &attr);
+	tcsetattr(tty.rfd, TCSANOW, &attr);
 
-	tty.out = open("/dev/tty", O_WRONLY);
-	if (!tty.out)
+	tty.wfd = open("/dev/tty", O_WRONLY);
+	if (!tty.wfd)
 		perror("open");
 
 	if (tty.ca)
@@ -395,9 +395,9 @@ tend(void)
 	tputs(T_CURSOR_VISIBLE);
 	if (tty.ca)
 		tputs(T_EXIT_CA_MODE);
-	tcsetattr(tty.in, TCSANOW, &tty.attr);
-	close(tty.in);
-	close(tty.out);
+	tcsetattr(tty.rfd, TCSANOW, &tty.attr);
+	close(tty.rfd);
+	close(tty.wfd);
 }
 
 int
@@ -406,7 +406,7 @@ tgetc(void)
 	char buf[3];
 	ssize_t n;
 
-	n = read(tty.in, buf, sizeof(buf));
+	n = read(tty.rfd, buf, sizeof(buf));
 	if (n < 0) {
 		perror("read");
 		return 0;
