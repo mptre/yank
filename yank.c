@@ -191,12 +191,12 @@ input(void)
 			break;
 		in.nmemb += n;
 
-		if (in.size < in.nmemb + 1) {
-			in.size *= 2;
-			in.v = realloc(in.v, in.size);
-			if (!in.v)
-				perror("realloc");
-		}
+		if (in.nmemb < in.size)
+			continue;
+		in.size *= 2;
+		in.v = realloc(in.v, in.size);
+		if (!in.v)
+			perror("realloc");
 	}
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
 }
