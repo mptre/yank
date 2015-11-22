@@ -9,9 +9,9 @@ Description
 -----------
 
 Read input from `stdin` and display a selection interface that allows a field to
-be selected and copied to the clipboard. Fields are determined by splitting the
-input on a delimiter sequence, optionally specified using the `-d` option. New
-line, carriage return and tab characters are always treated as delimiters.
+be selected and copied to the clipboard. Fields are either recognized by a
+regular expression using the `-g` option or by splitting the input on a
+delimiter sequence using the `-d` option.
 
 Using the arrow keys will move the selected field. The interface supports
 several Emacs like key bindings, consult the man page for further reference.
@@ -55,7 +55,7 @@ Examples
     and exit without invoking the yank command. Kill the selected PID:
 
     ```
-    ps ux | yank | xargs kill
+    ps ux | yank -g [0-9]+ | xargs kill
     ```
 
   - Yank the selected field to the clipboard as opposed of the default primary
