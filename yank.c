@@ -181,7 +181,7 @@ input(void)
 char *
 ator(const char *s)
 {
-	const char *f = "[^%s\n\r\t]+";
+	const char *f = "[^%s\f\n\r\t]+";
 	char *r;
 	size_t n;
 
