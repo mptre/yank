@@ -8,13 +8,15 @@
 .Nm yank
 .Op Fl lx | v
 .Op Fl d Ar delim
+.Op Fl g Ar pattern Op Fl i
 .Op Fl - Ar command Op Ar argument ...
 .Sh DESCRIPTION
 Read input from
 .Pa stdin
 and display a selection interface that allows a field to be selected and copied
-to the clipboard. Fields are determined by splitting the input on a delimiter
-sequence, optionally specified using the
+to the clipboard. Fields are either recognized by a regular expression using the
+.Fl g
+option or by splitting the input on a delimiter sequence using the
 .Fl d
 option, see
 .Em DELIMITERS .
@@ -39,6 +41,14 @@ option will be used as the yank command, see
 use all characters in
 .Ar delim
 as field delimiters
+.It Fl g Ar pattern
+use the regular expression
+.Ar pattern
+to recognized fields expressed as a to POSIX extended regular expression
+.It Fl i
+ignore case differences between
+.Ar pattern
+and the input
 .It Fl l
 use the default delimiters except for space, see
 .Em DELIMITERS
@@ -108,7 +118,7 @@ is not a terminal the selected field will be written to
 .Pa stdout
 and exit without invoking the yank command. Kill the selected PID:
 .Pp
-.Dl ps ux | yank | xargs kill
+.Dl ps ux | yank -g [0-9]+ | xargs kill
 .Pp
 Yank the selected field to the clipboard as opposed of the default primary
 clipboard:
@@ -118,3 +128,5 @@ clipboard:
 .Ex -std
 .Sh AUTHORS
 .An "Anton Lindqvist" Aq anton.lindqvist@gmail.com
+.Sh SEE ALSO
+.Xr re_format 7

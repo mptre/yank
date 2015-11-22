@@ -1,6 +1,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <locale.h>
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,23 +32,30 @@
 #define T_SAVE_CURSOR         "\033[s"
 
 #define CONTROL(c) (c ^ 0x40)
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-static const char *delim = " ";
+static regex_t pattern;
 
 static const char **yankargv;
+
+struct field {
+	size_t so; /* start offset */
+	size_t eo; /* end offset */
+	size_t lo; /* line offset */
+};
+
+static struct {
+	size_t nmemb;
+	size_t size;
+	struct field *v;
+} f;
 
 static struct {
 	size_t size;
 	size_t nmemb;
 	char *v;
 } in;
-
-static struct {
-	size_t size;
-	size_t nmemb;
-	size_t *v;
-} lines;
 
 static struct {
 	size_t nmemb;
@@ -61,14 +70,12 @@ static struct {
 } tty;
 
 static void args(int, const char **);
-static int field(const char *, size_t, int, size_t *, size_t *);
+static char *ator(const char *s);
 static void input(void);
-static int intersect(int, int, int, int);
-static int isdelim(const char *);
-static ssize_t rune(const char *s, size_t, int);
+static int intersect(struct field *, struct field *);
 static void yank(void);
 
-static void tdraw(const char *, size_t, int, int);
+static void tdraw(const char *, size_t, size_t, size_t);
 static void tend(void);
 static int tgetc(void);
 static void tmain(void);
@@ -81,15 +88,28 @@ static ssize_t xwrite(int, const char *, size_t);
 void
 args(int argc, const char **argv)
 {
+	char *s;
 	int c, i;
+	int f = REG_EXTENDED;
 
-	while ((c = getopt(argc, (char * const *) argv, "lvxd:")) != -1) {
+	s = ator(" ");
+	while ((c = getopt(argc, (char * const *) argv, "ilvxd:g:")) != -1) {
 		switch (c) {
 		case 'd':
-			delim = optarg;
+			free(s);
+			s = ator(optarg);
+			break;
+		case 'g':
+			free(s);
+			s = optarg;
+			f |= REG_NEWLINE;
+			break;
+		case 'i':
+			f |= REG_ICASE;
 			break;
 		case 'l':
-			delim = "";
+			free(s);
+			s = ator("");
 			break;
 		case 'v':
 			puts("yank " VERSION);
@@ -102,12 +122,18 @@ args(int argc, const char **argv)
 			fputs("usage: yank "
 			      "[-lx | -v] "
 			      "[-d delim] "
+			      "[-g pattern [-i]] "
 			      "[-- command [argument ...]]\n", stderr);
 			exit(1);
 		}
 	}
 	if (optind < argc && strncmp(argv[optind - 1] , "--", 3))
 		goto usage;
+
+	if (regcomp(&pattern, s, f)) {
+		fputs("yank: invalid regular expression\n", stderr);
+		exit(1);
+	}
 
 	/* Ensure space for yank command and null terminator. */
 	yankargv = calloc(argc - optind + 2, sizeof(const char *));
@@ -116,59 +142,6 @@ args(int argc, const char **argv)
 	yankargv[0] = YANKCMD;
 	for (i = optind; i < argc; i++)
 		yankargv[i - optind] = argv[i];
-}
-
-/*
- * Returns the next unicode rune offset relative to s + offset in the direction
- * given by inc.
- */
-ssize_t
-rune(const char *s, size_t offset, int inc)
-{
-	ssize_t i;
-
-	for (i = offset + inc;
-	     i + inc >= 0 && s[i] && (s[i] & 0xC0) == 0x80;
-	     i += inc)
-		/* NOP */;
-
-	return i - offset;
-}
-
-/*
- * Writes the next field to start and stop relative to s + offset in the
- * direction given by inc.
- */
-int
-field(const char *s, size_t offset, int inc, size_t *start, size_t *stop)
-{
-	ssize_t i, j, r;
-
-	r = 0;
-	i = offset;
-	for (;;) {
-		if (i < 0 || !s[i])
-			return 0;
-
-		if (!isdelim(&s[i]))
-			break;
-		r = rune(s, i, inc);
-		i += r;
-	}
-	i -= r < -1 ? r - inc : 0;
-
-	j = i;
-	for (;;) {
-		r = rune(s, j, inc);
-		j += r;
-		if (j < 0 || !s[j] || isdelim(&s[j]))
-			break;
-	}
-	j -= r < -1 ? r : inc;
-
-	*start = i;
-	*stop  = j;
-	return 1;
 }
 
 void
@@ -202,40 +175,39 @@ input(void)
 }
 
 /*
- * Returns nonzero if [x1, x2] and [y1, y2] intersects.
+ * Returns s transformed into a negation regular expression concatenated with
+ * all default delimiters.
  */
-int
-intersect(int x1, int y1, int x2, int y2)
+char *
+ator(const char *s)
 {
-	int m;
+	const char *f = "[^%s\n\r\t]+";
+	char *r;
+	size_t n;
 
-	while (x1 <= y1) {
-		m = x1 + (y1 - x1)/2;
-		if (x2 <= m && m <= y2)
-			return 1;
-		if (m < x2)
-			x1 = m + 1;
-		else
-			y1 = m - 1;
-	}
+	n = strlen(s) + strlen(f) + 1;
+	r = malloc(n);
+	if (!r)
+		perror("malloc");
+	if (snprintf(r, n, f, s) < 0)
+		perror("snprintf");
 
-	return 0;
+	return r;
 }
 
+/*
+ * Returns nonzero if f1 and f2 intersects. Both field start and end offsets are
+ * normalized with their corresponding line offset.
+ */
 int
-isdelim(const char *s)
+intersect(struct field *f1, struct field *f2)
 {
-	size_t i, n;
+	size_t s1, s2, e1, e2;
 
-	if (*s == '\n' || *s == '\r' || *s == '\t')
-		return 1;
+	s1 = f1->so - f1->lo, e1 = f1->eo - f1->lo;
+	s2 = f2->so - f2->lo, e2 = f2->eo - f2->lo;
 
-	n = rune(s, 0, 1);
-	for (i = 0; delim[i]; i += rune(delim, i, 1)) {
-		if (!strncmp(s, &delim[i], n))
-			return 1;
-	}
-	return 0;
+	return MAX(s1, s2) <= MIN(e1, e2);
 }
 
 void
@@ -301,7 +273,7 @@ xwrite(int fd, const char *s, size_t nmemb)
 }
 
 void
-tdraw(const char *s, size_t nmemb, int start, int stop)
+tdraw(const char *s, size_t nmemb, size_t start, size_t stop)
 {
 	twrite(s, start);
 	tputs(T_ENTER_STANDOUT_MODE);
@@ -330,8 +302,10 @@ tsetup(void)
 {
 	struct termios attr;
 	struct winsize ws;
-	char *s1, *s2;
-	size_t d, n;
+	regmatch_t r;
+	char *s, *e;
+	size_t m, n, w;
+	unsigned int i, j;
 
 	tty.in = open("/dev/tty", O_RDONLY);
 	if (!tty.in)
@@ -341,31 +315,49 @@ tsetup(void)
 	if (ioctl(tty.in, TIOCGWINSZ, &ws) < 0)
 		perror("ioctl");
 
-	lines.size = ws.ws_row + 1;
-	lines.v = calloc(lines.size, sizeof(size_t));
-	if (!lines.v)
-		perror("calloc");
-	lines.v[lines.nmemb++] = 0;
-	n = MIN(ws.ws_col*ws.ws_row, in.nmemb);
-	s1 = s2 = in.v;
-	while (n && lines.nmemb < lines.size) {
-		if (s1 == s2) {
-			s2 = memchr(s1, '\n', n);
-			if (s2) {
-				if (lines.size - lines.nmemb > 1)
-					s2++;
+	f.size = 32;
+	f.v = malloc(f.size*sizeof(struct field));
+	if (!f.v)
+		perror("malloc");
+	m = n = MIN(ws.ws_col*ws.ws_row, in.nmemb);
+	s = e = in.v;
+	while (m && !regexec(&pattern, e, 1, &r, 0)) {
+		f.v[f.nmemb].so = f.v[f.nmemb].eo = e - s;
+		f.v[f.nmemb].so += r.rm_so;
+		f.v[f.nmemb].eo += MAX(MIN(r.rm_eo, (ssize_t) m) - 1, 0);
+		e += r.rm_eo;
+		m -= MIN(r.rm_eo, (ssize_t) m);
+
+		if (++f.nmemb < f.size)
+			continue;
+		f.size *= 2;
+		f.v = realloc(f.v, f.size*sizeof(struct field));
+		if (!f.v)
+			perror("realloc");
+	}
+
+	for (i = j = 0, s = e = in.v; n && i < ws.ws_row; i++) {
+		if (s == e) {
+			e = memchr(s, '\n', n);
+			if (e) {
+				if (ws.ws_row - i > 1)
+					e++;
 			} else {
-				s2 = in.v + in.nmemb;
+				e = in.v + in.nmemb;
 			}
 		}
 
-		d = MIN(s2 - s1, ws.ws_col);
-		lines.v[lines.nmemb++] += d;
-		lines.v[lines.nmemb] = lines.v[lines.nmemb - 1];
-		n -= d;
-		s1 += d;
+		w = MIN(e - s, ws.ws_col);
+		for (; j < f.nmemb && f.v[j].so < (size_t) (s - in.v + w); j++)
+			f.v[j].lo = s - in.v;
+		s += w;
+		n -= w;
 	}
-	memset(in.v + lines.v[lines.nmemb], 0, in.nmemb - lines.v[lines.nmemb]);
+	f.nmemb = MIN(f.nmemb, j);
+	if (n && f.v[f.nmemb - 1].eo - f.v[f.nmemb - 1].lo >= ws.ws_col)
+		f.v[f.nmemb - 1].eo = f.v[f.nmemb - 1].lo + ws.ws_col - 1;
+	/* Number of bytes to output. */
+	f.v[f.nmemb].lo = MAX(s - in.v - 1, 0);
 
 	tcgetattr(tty.in, &tty.attr);
 	memcpy(&attr, &tty.attr, sizeof(struct termios));
@@ -380,9 +372,9 @@ tsetup(void)
 		tputs(T_ENTER_CA_MODE);
 	tputs(T_CURSOR_INVISIBLE);
 	/* Emit the number of lines and save the cursor position. */
-	for (n = 0; n < lines.nmemb; n++)
+	for (j = 0; j < i; j++)
 		tputs("\n");
-	for (n = 0; n < lines.nmemb; n++)
+	for (j = 0; j < i; j++)
 		tputs(T_KEY_UP);
 	tputs(T_SAVE_CURSOR);
 }
@@ -429,94 +421,76 @@ tgetc(void)
 void
 tmain(void)
 {
-	size_t d, o, start, stop, s, t, x, y;
-	int c, i;
+	int c, i, j, k;
+	size_t n;
 
-	if (field(in.v, 0, 1, &start, &stop))
-		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
+	n = f.v[f.nmemb].lo;
+	if (f.nmemb)
+		tdraw(in.v, n, f.v[0].so, f.v[0].eo);
 	else
-		twrite(in.v, lines.v[lines.nmemb - 1]);
-	for (;;) {
+		twrite(in.v, n);
+	for (i = j = 0;;) {
 		c = tgetc();
 		switch (c) {
 		case '\n':
-			sel.nmemb = stop - start + 1;
-			sel.v = in.v + start;
+			sel.nmemb = f.v[i].eo - f.v[i].so + 1;
+			sel.v = in.v + f.v[i].so;
 			/* FALLTHROUGH */
 		case CONTROL('C'):
 		case CONTROL('D'):
 			return;
 		case CONTROL('A'):
-			o = 0;
-			/* FALLTHROUGH */
-		if (0) {
+			j = 0;
+			break;
 		case CONTROL('N'):
 		case KEY_RIGHT:
-			o = stop + rune(in.v, stop, 1);
-		}
-			if (!field(in.v, o, 1, &start, &stop))
-				continue;
+			j = i + 1;
 			break;
 		case CONTROL('E'):
-			o = lines.v[lines.nmemb - 1] - 1;
-			/* FALLTHROUGH */
-		if (0) {
+			j = f.nmemb - 1;
+			break;
 		case CONTROL('P'):
 		case KEY_LEFT:
-			o = start + rune(in.v, start, -1);
-		}
-			if (!field(in.v, o, -1, &stop, &start))
-				continue;
+			j = i - 1;
 			break;
 		case KEY_DOWN:
-			i = 0;
-			while (lines.v[i + 1] <= stop)
-				i++;
-			d = lines.v[i];
-			o = lines.v[++i];
-			if (!field(in.v, o, 1, &s, &t))
+			j = i;
+			while (j < (ssize_t) f.nmemb && f.v[i].lo == f.v[j].lo)
+				j++;
+			if (j == (ssize_t) f.nmemb)
 				continue;
-			while (s < lines.v[i])
-				i++;
 			/* FALLTHROUGH */
 		if (0) {
 		case KEY_UP:
-			i = 0;
-			while (lines.v[i + 1] <= start)
-				i++;
-			d = o = lines.v[i];
-			o += rune(in.v, o, -1);
-			if (!field(in.v, o, -1, &t, &s))
-				continue;
-			while (lines.v[i] > s)
-				i--;
+			k = i;
+			while (k && f.v[i].lo == f.v[k].lo)
+				k--;
+			j = k;
+			while (j && f.v[j - 1].lo == f.v[k].lo)
+				j--;
 		}
-			o = lines.v[i];
 			for (;;) {
-				if (!field(in.v, o, 1, &x, &y)
-				    || y >= lines.v[i + 1])
+				if (f.v[j].lo < f.v[j + 1].lo
+				    || intersect(&f.v[i], &f.v[j]))
 					break;
-				s = x;
-				t = y;
-				if (intersect(start - d, stop - d,
-					      s - lines.v[i], t - lines.v[i]))
-					break;
-				o = t + rune(in.v, t, 1);
+				j++;
 			}
-			start = s;
-			stop = t;
 			break;
 		default:
 			continue;
 		}
+		if (j < 0 || j >= (ssize_t) f.nmemb)
+			continue;
+		i = j;
 		tputs(T_RESTORE_CURSOR);
-		tdraw(in.v, lines.v[lines.nmemb - 1], start, stop);
+		tdraw(in.v, n, f.v[i].so, f.v[i].eo);
 	}
 }
 
 int
 main(int argc, const char *argv[])
 {
+	setlocale(LC_ALL, "");
 	args(argc, argv);
 	input();
 	tsetup();
