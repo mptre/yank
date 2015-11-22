@@ -176,7 +176,7 @@ input(void)
 
 /*
  * Returns s transformed into a negation regular expression concatenated with
- * all default delimiters.
+ * the default delimiters.
  */
 char *
 ator(const char *s)
@@ -424,12 +424,13 @@ tmain(void)
 	int c, i, j, k;
 	size_t n;
 
+	i = j = 0;
 	n = f.v[f.nmemb].lo;
 	if (f.nmemb)
 		tdraw(in.v, n, f.v[0].so, f.v[0].eo);
 	else
 		twrite(in.v, n);
-	for (i = j = 0;;) {
+	for (;;) {
 		c = tgetc();
 		switch (c) {
 		case '\n':
