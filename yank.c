@@ -319,7 +319,7 @@ tsetup(void)
 	f.v = malloc(f.size*sizeof(struct field));
 	if (!f.v)
 		perror("malloc");
-	m = n = MIN(ws.ws_col*ws.ws_row, in.nmemb);
+	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t) in.nmemb);
 	s = e = in.v;
 	while (m && !regexec(&pattern, e, 1, &r, 0)) {
 		f.v[f.nmemb].so = f.v[f.nmemb].eo = e - s;
