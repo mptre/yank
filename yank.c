@@ -354,6 +354,7 @@ tsetup(void)
 		n -= w;
 	}
 	f.nmemb = MIN(f.nmemb, j);
+	/* Ensure last field does not exceed the terminal width. */
 	if (n && f.v[f.nmemb - 1].eo - f.v[f.nmemb - 1].lo >= ws.ws_col)
 		f.v[f.nmemb - 1].eo = f.v[f.nmemb - 1].lo + ws.ws_col - 1;
 	/* Number of bytes to output. */
