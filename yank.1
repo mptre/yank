@@ -8,13 +8,15 @@
 .Nm yank
 .Op Fl lx | v
 .Op Fl d Ar delim
+.Op Fl g Ar pattern Op Fl i
 .Op Fl - Ar command Op Ar argument ...
 .Sh DESCRIPTION
 Read input from
 .Pa stdin
 and display a selection interface that allows a field to be selected and copied
-to the clipboard. Fields are determined by splitting the input on a delimiter
-sequence, optionally specified using the
+to the clipboard. Fields are either recognized by a regular expression using the
+.Fl g
+option or by splitting the input on a delimiter sequence using the
 .Fl d
 option, see
 .Em DELIMITERS .
@@ -36,9 +38,18 @@ option will be used as the yank command, see
 .Sh OPTIONS
 .Bl -tag -width -indent
 .It Fl d Ar delim
-use all characters in
+all input characters not present in
 .Ar delim
-as field delimiters
+will be recognized as fields, see
+.Em DELIMITERS
+.It Fl g Ar pattern
+use the regular expression
+.Ar pattern
+to recognize fields expressed as a to POSIX extended regular expression
+.It Fl i
+ignore case differences between
+.Ar pattern
+and the input
 .It Fl l
 use the default delimiters except for space, see
 .Em DELIMITERS
@@ -73,20 +84,27 @@ move selection to the previous line
 exit using the selected field
 .El
 .Sh DELIMITERS
-The following characters are always recognized as delimiters:
+If the
+.Fl d
+and
+.Fl g
+options are omitted the following characters are recognized as delimiters by
+default:
 .Bl -tag -width -indent
+.It \ef
+form feed
 .It \en
 new line
 .It \er
 carriage return
+.It \es
+space
 .It \et
 horizontal tab
 .El
 If the
 .Fl d
-and
-.Fl l
-options are omitted space is also recognized as a delimiter.
+option is present space is not recognized as a delimiter.
 .Sh EXAMPLES
 Yank a environment variable key or value:
 .Pp
@@ -108,7 +126,7 @@ is not a terminal the selected field will be written to
 .Pa stdout
 and exit without invoking the yank command. Kill the selected PID:
 .Pp
-.Dl ps ux | yank | xargs kill
+.Dl ps ux | yank -g [0-9]+ | xargs kill
 .Pp
 Yank the selected field to the clipboard as opposed of the default primary
 clipboard:
@@ -116,5 +134,7 @@ clipboard:
 .Dl yank -- xsel -b
 .Sh DIAGNOSTICS
 .Ex -std
+.Sh SEE ALSO
+.Xr re_format 7
 .Sh AUTHORS
 .An "Anton Lindqvist" Aq anton.lindqvist@gmail.com
