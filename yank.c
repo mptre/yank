@@ -71,8 +71,8 @@ static struct {
 
 static void args(int, const char **);
 static char *ator(const char *s);
+static int fcmp(struct field *, struct field *);
 static void input(void);
-static int intersect(struct field *, struct field *);
 static void yank(void);
 
 static void tdraw(const char *, size_t, size_t, size_t);
@@ -196,18 +196,19 @@ ator(const char *s)
 }
 
 /*
- * Returns nonzero if f1 and f2 intersects. Both field start and end offsets are
- * normalized with their corresponding line offset.
+ * Returns zero if f1 and f2 intersects, 1 if f2 begins after f1 and -1
+ * otherwise. Both field start and end offsets are normalized with their
+ * corresponding line offset.
  */
 int
-intersect(struct field *f1, struct field *f2)
+fcmp(struct field *f1, struct field *f2)
 {
 	size_t s1, s2, e1, e2;
 
 	s1 = f1->so - f1->lo, e1 = f1->eo - f1->lo;
 	s2 = f2->so - f2->lo, e2 = f2->eo - f2->lo;
 
-	return MAX(s1, s2) <= MIN(e1, e2);
+	return MAX(s1, s2) <= MIN(e1, e2) ? 0 : (e1 < s2 ? 1 : -1);
 }
 
 void
@@ -471,12 +472,9 @@ tmain(void)
 			while (j && f.v[j - 1].lo == f.v[k].lo)
 				j--;
 		}
-			for (;;) {
-				if (f.v[j].lo < f.v[j + 1].lo
-				    || intersect(&f.v[i], &f.v[j]))
-					break;
-				j++;
-			}
+			for (; fcmp(&f.v[i], &f.v[j]) < 0
+			     && f.v[j].lo == f.v[j + 1].lo; j++)
+				/* NOP */;
 			break;
 		default:
 			continue;
