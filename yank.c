@@ -136,8 +136,7 @@ args(int argc, const char **argv)
 	}
 
 	/* Ensure space for yank command and null terminator. */
-	yankargv = calloc(argc - optind + 2, sizeof(const char *));
-	if (!yankargv)
+	if (!(yankargv = calloc(argc - optind + 2, sizeof(const char *))))
 		perror("calloc");
 	yankargv[0] = YANKCMD;
 	for (i = optind; i < argc; i++)
@@ -150,25 +149,22 @@ input(void)
 	int n;
 
 	in.size = BUFSIZ;
-	in.v = malloc(in.size);
-	if (!in.v)
+	if (!(in.v = malloc(in.size)))
 		perror("malloc");
 
 	for (;;) {
-		n = read(0, in.v + in.nmemb, in.size - in.nmemb);
+		if (!(n = read(0, in.v + in.nmemb, in.size - in.nmemb)))
+			break;
 		if (n < 0) {
 			perror("read");
 			break;
 		}
-		if (!n)
-			break;
 		in.nmemb += n;
 
 		if (in.nmemb < in.size)
 			continue;
 		in.size *= 2;
-		in.v = realloc(in.v, in.size);
-		if (!in.v)
+		if (!(in.v = realloc(in.v, in.size)))
 			perror("realloc");
 	}
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
@@ -186,8 +182,7 @@ ator(const char *s)
 	size_t n;
 
 	n = strlen(s) + strlen(f) + 1;
-	r = malloc(n);
-	if (!r)
+	if (!(r = malloc(n)))
 		perror("malloc");
 	if (snprintf(r, n, f, s) < 0)
 		perror("snprintf");
@@ -308,8 +303,7 @@ tsetup(void)
 	size_t m, n, w;
 	unsigned int i, j;
 
-	tty.rfd = open("/dev/tty", O_RDONLY);
-	if (!tty.rfd)
+	if (!(tty.rfd = open("/dev/tty", O_RDONLY)))
 		perror("open");
 
 	ws.ws_col = 80, ws.ws_row = 24;
@@ -317,8 +311,7 @@ tsetup(void)
 		perror("ioctl");
 
 	f.size = 32;
-	f.v = malloc(f.size*sizeof(struct field));
-	if (!f.v)
+	if (!(f.v = malloc(f.size*sizeof(struct field))))
 		perror("malloc");
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t) in.nmemb);
 	s = e = in.v;
@@ -332,8 +325,7 @@ tsetup(void)
 		if (++f.nmemb < f.size)
 			continue;
 		f.size *= 2;
-		f.v = realloc(f.v, f.size*sizeof(struct field));
-		if (!f.v)
+		if (!(f.v = realloc(f.v, f.size*sizeof(struct field))))
 			perror("realloc");
 	}
 
@@ -366,8 +358,7 @@ tsetup(void)
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
 	tcsetattr(tty.rfd, TCSANOW, &attr);
 
-	tty.wfd = open("/dev/tty", O_WRONLY);
-	if (!tty.wfd)
+	if (!(tty.wfd = open("/dev/tty", O_WRONLY)))
 		perror("open");
 
 	if (tty.ca)
