@@ -28,8 +28,8 @@
 #define T_KEY_LEFT            "\033[D"
 #define T_KEY_RIGHT           "\033[C"
 #define T_KEY_UP              "\033[A"
-#define T_RESTORE_CURSOR      "\033[u"
-#define T_SAVE_CURSOR         "\033[s"
+#define T_RESTORE_CURSOR      "\0338"
+#define T_SAVE_CURSOR         "\0337"
 
 #define CONTROL(c) (c ^ 0x40)
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
