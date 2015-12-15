@@ -31,7 +31,7 @@
 #define T_RESTORE_CURSOR      "\0338"
 #define T_SAVE_CURSOR         "\0337"
 
-#define CONTROL(c) (c ^ 0x40)
+#define CONTROL(c) (c^0x40)
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
@@ -313,14 +313,14 @@ tsetup(void)
 	f.size = 32;
 	if (!(f.v = malloc(f.size*sizeof(struct field))))
 		perror("malloc");
-	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t) in.nmemb);
+	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
 	while (m && !regexec(&pattern, e, 1, &r, 0)) {
 		f.v[f.nmemb].so = f.v[f.nmemb].eo = e - s;
 		f.v[f.nmemb].so += r.rm_so;
-		f.v[f.nmemb].eo += MAX(MIN(r.rm_eo, (ssize_t) m) - 1, 0);
+		f.v[f.nmemb].eo += MAX(MIN(r.rm_eo, (ssize_t)m) - 1, 0);
 		e += r.rm_eo;
-		m -= MIN(r.rm_eo, (ssize_t) m);
+		m -= MIN(r.rm_eo, (ssize_t)m);
 
 		if (++f.nmemb < f.size)
 			continue;
@@ -341,7 +341,7 @@ tsetup(void)
 		}
 
 		w = MIN(e - s, ws.ws_col);
-		for (; j < f.nmemb && f.v[j].so < (size_t) (s - in.v + w); j++)
+		for (; j < f.nmemb && f.v[j].so < (size_t)(s - in.v + w); j++)
 			f.v[j].lo = s - in.v;
 		s += w;
 		n -= w;
@@ -449,9 +449,9 @@ tmain(void)
 			break;
 		case KEY_DOWN:
 			j = i;
-			while (j < (ssize_t) f.nmemb && f.v[i].lo == f.v[j].lo)
+			while (j < (ssize_t)f.nmemb && f.v[i].lo == f.v[j].lo)
 				j++;
-			if (j == (ssize_t) f.nmemb)
+			if (j == (ssize_t)f.nmemb)
 				continue;
 			/* FALLTHROUGH */
 		if (0) {
@@ -470,7 +470,7 @@ tmain(void)
 		default:
 			continue;
 		}
-		if (j < 0 || j >= (ssize_t) f.nmemb)
+		if (j < 0 || j >= (ssize_t)f.nmemb)
 			continue;
 		i = j;
 		tputs(T_RESTORE_CURSOR);
