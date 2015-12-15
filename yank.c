@@ -237,7 +237,7 @@ yank(void)
 	case 0:
 		execvp(yankargv[0], (char * const *) yankargv);
 		s = errno;
-		err(1, yankargv[0]);
+		err(1, "%s", yankargv[0]);
 		_exit(126 + (s == ENOENT));
 	default:
 		waitpid(pid, &s, 0);
