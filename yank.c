@@ -1,3 +1,4 @@
+#include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -137,7 +138,7 @@ args(int argc, const char **argv)
 
 	/* Ensure space for yank command and null terminator. */
 	if (!(yankargv = calloc(argc - optind + 2, sizeof(const char *))))
-		perror("calloc");
+		err(1, "calloc");
 	yankargv[0] = YANKCMD;
 	for (i = optind; i < argc; i++)
 		yankargv[i - optind] = argv[i];
@@ -150,22 +151,18 @@ input(void)
 
 	in.size = BUFSIZ;
 	if (!(in.v = malloc(in.size)))
-		perror("malloc");
+		err(1, "malloc");
 
-	for (;;) {
-		if (!(n = read(0, in.v + in.nmemb, in.size - in.nmemb)))
-			break;
-		if (n < 0) {
-			perror("read");
-			break;
-		}
+	while ((n = read(0, in.v + in.nmemb, in.size - in.nmemb))) {
+		if (n < 0)
+			err(1, "read");
 		in.nmemb += n;
 
 		if (in.nmemb < in.size)
 			continue;
 		in.size *= 2;
 		if (!(in.v = realloc(in.v, in.size)))
-			perror("realloc");
+			err(1, "realloc");
 	}
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
 }
@@ -183,9 +180,9 @@ ator(const char *s)
 
 	n = strlen(s) + strlen(f) + 1;
 	if (!(r = malloc(n)))
-		perror("malloc");
+		err(1, "malloc");
 	if (snprintf(r, n, f, s) < 0)
-		perror("snprintf");
+		err(1, "snprintf");
 
 	return r;
 }
@@ -218,29 +215,29 @@ yank(void)
 
 	if (!isatty(1)) {
 		if (xwrite(1, sel.v, sel.nmemb) < 0)
-			perror("write");
+			err(1, "write");
 		exit(0);
 	}
 
 	if (pipe(fd) < 0)
-		perror("pipe");
+		err(1, "pipe");
 	if (dup2(fd[0], 0) < 0)
-		perror("dup2");
+		err(1, "dup2");
 	if (close(fd[0]) < 0)
-		perror("close");
+		err(1, "close");
 	if (xwrite(fd[1], sel.v, sel.nmemb) < 0)
-		perror("write");
+		err(1, "write");
 	if (close(fd[1]) < 0)
-		perror("close");
+		err(1, "close");
 	pid = fork();
 	switch (pid) {
 	case -1:
-		perror("fork");
+		err(1, "fork");
 		exit(1);
 	case 0:
 		execvp(yankargv[0], (char * const *) yankargv);
 		s = errno;
-		perror(yankargv[0]);
+		err(1, yankargv[0]);
 		_exit(126 + (s == ENOENT));
 	default:
 		waitpid(pid, &s, 0);
@@ -290,7 +287,7 @@ void
 twrite(const char *s, size_t nmemb)
 {
 	if (xwrite(tty.wfd, s, nmemb) < 0)
-		perror("write");
+		err(1, "write");
 }
 
 void
@@ -304,15 +301,15 @@ tsetup(void)
 	unsigned int i, j;
 
 	if (!(tty.rfd = open("/dev/tty", O_RDONLY)))
-		perror("open");
+		err(1, "open");
 
 	ws.ws_col = 80, ws.ws_row = 24;
 	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) < 0)
-		perror("ioctl");
+		err(1, "ioctl");
 
 	f.size = 32;
 	if (!(f.v = malloc(f.size*sizeof(struct field))))
-		perror("malloc");
+		err(1, "malloc");
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
 	while (m && !regexec(&pattern, e, 1, &r, 0)) {
@@ -326,7 +323,7 @@ tsetup(void)
 			continue;
 		f.size *= 2;
 		if (!(f.v = realloc(f.v, f.size*sizeof(struct field))))
-			perror("realloc");
+			err(1, "realloc");
 	}
 
 	for (i = j = 0, s = e = in.v; n && i < ws.ws_row; i++) {
@@ -359,7 +356,7 @@ tsetup(void)
 	tcsetattr(tty.rfd, TCSANOW, &attr);
 
 	if (!(tty.wfd = open("/dev/tty", O_WRONLY)))
-		perror("open");
+		err(1, "open");
 
 	if (tty.ca)
 		tputs(T_ENTER_CA_MODE);
@@ -392,10 +389,8 @@ tgetc(void)
 	ssize_t n;
 
 	n = read(tty.rfd, buf, sizeof(buf));
-	if (n < 0) {
-		perror("read");
-		return 0;
-	}
+	if (n < 0)
+		err(1, "read");
 	if (n > 2) {
 		if (!strncmp(T_KEY_UP, buf, n))
 			return KEY_UP;
