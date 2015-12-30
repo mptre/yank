@@ -312,7 +312,7 @@ tsetup(void)
 		err(1, "malloc");
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
-	while (m && !regexec(&pattern, e, 1, &r, 0)) {
+	while (m && !regexec(&pattern, e, 1, &r, 0) && r.rm_eo - r.rm_so) {
 		f.v[f.nmemb].so = f.v[f.nmemb].eo = e - s;
 		f.v[f.nmemb].so += r.rm_so;
 		f.v[f.nmemb].eo += MAX(MIN(r.rm_eo, (ssize_t)m) - 1, 0);
