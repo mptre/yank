@@ -303,7 +303,6 @@ tsetup(void)
 	if (!(tty.rfd = open("/dev/tty", O_RDONLY)))
 		err(1, "open");
 
-	ws.ws_col = 80, ws.ws_row = 24;
 	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) < 0)
 		err(1, "ioctl");
 
