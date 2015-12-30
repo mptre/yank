@@ -422,6 +422,8 @@ tmain(void)
 		c = tgetc();
 		switch (c) {
 		case '\n':
+			if (!f.nmemb)
+				continue;
 			sel.nmemb = f.v[i].eo - f.v[i].so + 1;
 			sel.v = in.v + f.v[i].so;
 			/* FALLTHROUGH */
