@@ -125,7 +125,7 @@ args(int argc, const char **argv)
 			      "[-d delim] "
 			      "[-g pattern [-i]] "
 			      "[-- command [argument ...]]\n", stderr);
-			exit(1);
+			exit(2);
 		}
 	}
 	if (optind < argc && strncmp(argv[optind - 1] , "--", 3))
