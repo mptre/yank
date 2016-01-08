@@ -36,20 +36,20 @@
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
+typedef struct {
+	size_t so; /* start offset */
+	size_t eo; /* end offset */
+	size_t lo; /* line offset */
+} Field;
+
 static regex_t pattern;
 
 static const char **yankargv;
 
-struct field {
-	size_t so; /* start offset */
-	size_t eo; /* end offset */
-	size_t lo; /* line offset */
-};
-
 static struct {
 	size_t nmemb;
 	size_t size;
-	struct field *v;
+	Field *v;
 } f;
 
 static struct {
@@ -72,7 +72,7 @@ static struct {
 
 static void args(int, const char **);
 static char *ator(const char *s);
-static int fcmp(struct field *, struct field *);
+static int fcmp(const Field *, const Field *);
 static void input(void);
 static void yank(void);
 
@@ -193,7 +193,7 @@ ator(const char *s)
  * corresponding line offset.
  */
 int
-fcmp(struct field *f1, struct field *f2)
+fcmp(const Field *f1, const Field *f2)
 {
 	size_t s1, s2, e1, e2;
 
@@ -307,7 +307,7 @@ tsetup(void)
 		err(1, "ioctl");
 
 	f.size = 32;
-	if (!(f.v = malloc(f.size*sizeof(struct field))))
+	if (!(f.v = malloc(f.size*sizeof(Field))))
 		err(1, "malloc");
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
@@ -321,7 +321,7 @@ tsetup(void)
 		if (++f.nmemb < f.size)
 			continue;
 		f.size *= 2;
-		if (!(f.v = realloc(f.v, f.size*sizeof(struct field))))
+		if (!(f.v = realloc(f.v, f.size*sizeof(Field))))
 			err(1, "realloc");
 	}
 
