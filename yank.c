@@ -128,7 +128,7 @@ args(int argc, const char **argv)
 			exit(2);
 		}
 	}
-	if (optind < argc && strncmp(argv[optind - 1] , "--", 3))
+	if (optind < argc && strncmp(argv[optind - 1], "--", 3))
 		goto usage;
 
 	if (regcomp(&pattern, s, f)) {
