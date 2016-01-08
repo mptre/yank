@@ -94,7 +94,7 @@ args(int argc, const char **argv)
 	int f = REG_EXTENDED;
 
 	s = ator(" ");
-	while ((c = getopt(argc, (char * const *) argv, "ilvxd:g:")) != -1) {
+	while ((c = getopt(argc, (char * const *)argv, "ilvxd:g:")) != -1) {
 		switch (c) {
 		case 'd':
 			free(s);
@@ -235,7 +235,7 @@ yank(void)
 		err(1, "fork");
 		exit(1);
 	case 0:
-		execvp(yankargv[0], (char * const *) yankargv);
+		execvp(yankargv[0], (char * const *)yankargv);
 		s = errno;
 		err(1, "%s", yankargv[0]);
 		_exit(126 + (s == ENOENT));
