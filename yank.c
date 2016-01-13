@@ -326,15 +326,8 @@ tsetup(void)
 	}
 
 	for (i = j = 0, s = e = in.v; n && i < ws.ws_row; i++) {
-		if (s == e) {
-			e = memchr(s, '\n', n);
-			if (e) {
-				if (ws.ws_row - i > 1)
-					e++;
-			} else {
-				e = in.v + in.nmemb;
-			}
-		}
+		if (s == e && !(e = memchr(s + 1, '\n', n)))
+			e = in.v + in.nmemb;
 
 		w = MIN(e - s, ws.ws_col);
 		for (; j < f.nmemb && f.v[j].so < (size_t)(s - in.v + w); j++)
