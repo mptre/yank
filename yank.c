@@ -377,21 +377,27 @@ tend(void)
 int
 tgetc(void)
 {
+	static struct {
+		const char *s;
+		int c;
+	} keys[] = {
+		{ T_KEY_UP,    KEY_UP    },
+		{ T_KEY_RIGHT, KEY_RIGHT },
+		{ T_KEY_DOWN,  KEY_DOWN  },
+		{ T_KEY_LEFT,  KEY_LEFT  },
+		{ NULL,        0         },
+	};
 	char buf[3];
 	ssize_t n;
+	int i;
 
 	n = read(tty.rfd, buf, sizeof(buf));
 	if (n < 0)
 		err(1, "read");
 	if (n > 2) {
-		if (!strncmp(T_KEY_UP, buf, n))
-			return KEY_UP;
-		if (!strncmp(T_KEY_RIGHT, buf, n))
-			return KEY_RIGHT;
-		if (!strncmp(T_KEY_DOWN, buf, n))
-			return KEY_DOWN;
-		if (!strncmp(T_KEY_LEFT, buf, n))
-			return KEY_LEFT;
+		for (i = 0; keys[i].s; i++)
+			if (strncmp(keys[i].s, buf, n) == 0)
+				return keys[i].c;
 		return 0;
 	}
 
