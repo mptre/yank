@@ -432,6 +432,7 @@ tmain(void)
 			j = 0;
 			break;
 		case CONTROL('N'):
+		case 'l':
 		case KEY_RIGHT:
 			j = i + 1;
 			break;
@@ -439,9 +440,11 @@ tmain(void)
 			j = f.nmemb - 1;
 			break;
 		case CONTROL('P'):
+		case 'h':
 		case KEY_LEFT:
 			j = i - 1;
 			break;
+		case 'j':
 		case KEY_DOWN:
 			j = i;
 			while (j < (ssize_t)f.nmemb && f.v[i].lo == f.v[j].lo)
@@ -450,6 +453,7 @@ tmain(void)
 				continue;
 			/* FALLTHROUGH */
 		if (0) {
+		case 'k':
 		case KEY_UP:
 			k = i;
 			while (k && f.v[i].lo == f.v[k].lo)
