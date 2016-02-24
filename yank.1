@@ -22,7 +22,7 @@ option, see
 .Em DELIMITERS .
 .Pp
 Using the arrow keys will move the selected field. The interface support several
-Emacs like key bindings, see
+Emacs and Vi like key bindings, see
 .Em COMMANDS .
 Pressing the return key will invoke the yank command and write the selected
 field to the its
@@ -72,14 +72,10 @@ move selection to the first field
 exit without invoking the yank command
 .It Ctrl-E
 move selection to the last field
-.It Ctrl-N or Right
-move selection to the right
-.It Ctrl-P or Left
-move selection to the left
-.It Down
-move selection to the next line
-.It Up
-move selection to the previous line
+.It Ctrl-P/Ctrl-N, Left/Right or h/l
+move selection to the left or right
+.It Up/Down or j/k
+move selection to the next or previous line
 .It Enter
 exit using the selected field
 .El
