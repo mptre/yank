@@ -432,6 +432,7 @@ tmain(void)
 			j = 0;
 			break;
 		case CONTROL('N'):
+		case 'l':
 		case KEY_RIGHT:
 		case 'l':
 			j = i + 1;
@@ -440,10 +441,12 @@ tmain(void)
 			j = f.nmemb - 1;
 			break;
 		case CONTROL('P'):
+		case 'h':
 		case KEY_LEFT:
 		case 'h':
 			j = i - 1;
 			break;
+		case 'j':
 		case KEY_DOWN:
 		case 'j':
 			j = i;
@@ -453,6 +456,7 @@ tmain(void)
 				continue;
 			/* FALLTHROUGH */
 		if (0) {
+		case 'k':
 		case KEY_UP:
 		case 'k':
 			k = i;
