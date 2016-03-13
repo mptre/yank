@@ -236,9 +236,7 @@ yank(void)
 		exit(1);
 	case 0:
 		execvp(yankargv[0], (char * const *)yankargv);
-		s = errno;
-		err(1, "%s", yankargv[0]);
-		_exit(126 + (s == ENOENT));
+		err(126 + (errno == ENOENT), "%s", yankargv[0]);
 	default:
 		waitpid(pid, &s, 0);
 		if (WIFSIGNALED(s))
