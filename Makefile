@@ -1,10 +1,11 @@
-VERSION = 0.6.4
+VERSION=	0.6.4
 
-PREFIX  ?= /usr/local
-YANKCMD ?= xsel
+YANKCMD=	xsel
 
-CFLAGS   += -Os -pedantic -std=c99 -Wall -Werror -Wextra
-CPPFLAGS += -DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
+PREFIX=		/usr/local
+
+CFLAGS+=	-Os -pedantic -std=c99 -Wall -Werror -Wextra
+CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 yank: yank.c
 	${CC} ${CFLAGS} $< -o $@ ${LDFLAGS} ${CPPFLAGS}

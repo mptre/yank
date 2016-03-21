@@ -74,11 +74,11 @@ Run the following command:
   make
   ```
 
-The default yank command can be defined using the `YANKCMD` environment
-variable. Example: OS X users would use `pbcopy` as the default yank command:
+The default yank command can be defined using the `YANKCMD` variable. Example:
+OS X users would use `pbcopy` as the default yank command:
 
   ```
-  YANKCMD=pbcopy make
+  make YANKCMD=pbcopy
   ```
 
 Alternatively put the `YANKCMD` variable declaration in your local `config.mk`
