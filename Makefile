@@ -22,7 +22,7 @@ install: yank
 	@echo "yank.1 -> ${MANPREFIX}/man1/yank.1"
 	@mkdir -p "${MANPREFIX}/man1"
 	@cp -f yank.1 "${MANPREFIX}/man1/yank.1"
-	@chmod 644 "${PREFIX}/share/man/man1/yank.1"
+	@chmod 644 "${MANPREFIX}/man1/yank.1"
 
 .PHONY: clean install
 
