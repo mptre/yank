@@ -111,10 +111,10 @@ The install directory defaults to `/usr/local`:
   make install
   ```
 
-Change the install directory using the `PREFIX` environment variable:
+Change the install directory using the `PREFIX` variable:
 
   ```
-  PREFIX=DIR make install
+  make PREFIX=DIR install
   ```
 
 [1] http://www.vergenet.net/~conrad/software/xsel/
