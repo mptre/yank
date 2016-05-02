@@ -5,7 +5,7 @@ YANKCMD=	xsel
 PREFIX=		/usr/local
 MANPREFIX=	${PREFIX}/share/man
 
-CFLAGS+=	-Os -pedantic -std=c99 -Wall -Werror -Wextra
+CFLAGS+=	-pedantic -Wall -Werror -Wextra
 CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 yank: yank.c
