@@ -70,11 +70,11 @@ static struct {
 	struct termios attr;
 } tty;
 
-static void args(int, const char **);
 static char *ator(const char *s);
 static int fcmp(const Field *, const Field *);
 static void input(void);
 static void yank(void);
+__dead static void usage(void);
 
 static void tdraw(const char *, size_t, size_t, size_t);
 static void tend(void);
@@ -85,64 +85,6 @@ static void tsetup(void);
 static void twrite(const char *, size_t);
 
 static ssize_t xwrite(int, const char *, size_t);
-
-void
-args(int argc, const char **argv)
-{
-	char *s;
-	int c, i;
-	int f = REG_EXTENDED;
-
-	s = ator(" ");
-	while ((c = getopt(argc, (char * const *)argv, "ilvxd:g:")) != -1) {
-		switch (c) {
-		case 'd':
-			free(s);
-			s = ator(optarg);
-			break;
-		case 'g':
-			free(s);
-			s = optarg;
-			f |= REG_NEWLINE;
-			break;
-		case 'i':
-			f |= REG_ICASE;
-			break;
-		case 'l':
-			free(s);
-			s = ator("");
-			break;
-		case 'v':
-			puts("yank " VERSION);
-			exit(0);
-		case 'x':
-			tty.ca = 1;
-			break;
-		default:
-		usage:
-			fputs("usage: yank "
-			      "[-lx | -v] "
-			      "[-d delim] "
-			      "[-g pattern [-i]] "
-			      "[-- command [argument ...]]\n", stderr);
-			exit(2);
-		}
-	}
-	if (optind < argc && strncmp(argv[optind - 1], "--", 3))
-		goto usage;
-
-	if (regcomp(&pattern, s, f)) {
-		fputs("yank: invalid regular expression\n", stderr);
-		exit(1);
-	}
-
-	/* Ensure space for yank command and null terminator. */
-	if (!(yankargv = calloc(argc - optind + 2, sizeof(const char *))))
-		err(1, "calloc");
-	yankargv[0] = YANKCMD;
-	for (i = optind; i < argc; i++)
-		yankargv[i - optind] = argv[i];
-}
 
 void
 input(void)
@@ -475,11 +417,63 @@ tmain(void)
 	}
 }
 
-int
-main(int argc, const char *argv[])
+void
+usage(void)
 {
-	setlocale(LC_ALL, "");
-	args(argc, argv);
+	fprintf(stderr, "usage: yank [-lx | -v] [-d delim] [-g pattern [-i]] "
+	    "[-- command [argument ...]]\n");
+	exit(2);
+}
+
+int
+main(int argc, char *argv[])
+{
+	char *s;
+	int c, i, rflags = REG_EXTENDED;
+
+	setlocale(LC_CTYPE, "");
+
+	s = ator(" ");
+	while ((c = getopt(argc, argv, "ilvxd:g:")) != -1)
+		switch (c) {
+		case 'd':
+			free(s);
+			s = ator(optarg);
+			break;
+		case 'g':
+			free(s);
+			s = optarg;
+			rflags |= REG_NEWLINE;
+			break;
+		case 'i':
+			rflags |= REG_ICASE;
+			break;
+		case 'l':
+			free(s);
+			s = ator("");
+			break;
+		case 'v':
+			puts("yank " VERSION);
+			exit(0);
+		case 'x':
+			tty.ca = 1;
+			break;
+		default:
+			usage();
+		}
+	argc -= optind;
+	argv += optind;
+
+	if (regcomp(&pattern, s, rflags) != 0)
+		errx(1, "invalid regular expression");
+
+	/* Ensure space for yank command and null terminator. */
+	if (!(yankargv = calloc(argc + 2, sizeof(const char *))))
+		err(1, NULL);
+	yankargv[0] = YANKCMD;
+	for (i = 0; i < argc; i++)
+		yankargv[i] = argv[i];
+
 	input();
 	tsetup();
 	tmain();
