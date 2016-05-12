@@ -422,6 +422,11 @@ main(int argc, char *argv[])
 	char *s;
 	int c, i, rflags = REG_EXTENDED;
 
+#ifdef __OpenBSD__
+	if (pledge("stdio rpath proc exec tty", NULL) == -1)
+		err(1, "pledge");
+#endif
+
 	setlocale(LC_CTYPE, "");
 
 	s = ator(" ");
