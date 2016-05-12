@@ -87,7 +87,7 @@ input(void)
 	int n;
 
 	in.size = BUFSIZ;
-	if (!(in.v = malloc(in.size)))
+	if ((in.v = malloc(in.size)) == NULL)
 		err(1, NULL);
 
 	while ((n = read(0, in.v + in.nmemb, in.size - in.nmemb))) {
@@ -98,7 +98,7 @@ input(void)
 		if (in.nmemb < in.size)
 			continue;
 		in.size *= 2;
-		if (!(in.v = realloc(in.v, in.size)))
+		if ((in.v = realloc(in.v, in.size)) == NULL)
 			err(1, NULL);
 	}
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
@@ -116,7 +116,7 @@ ator(const char *s)
 	size_t n;
 
 	n = strlen(s) + strlen(f) + 1;
-	if (!(r = malloc(n)))
+	if ((r = malloc(n)) == NULL)
 		err(1, NULL);
 	if (snprintf(r, n, f, s) < 0)
 		err(1, "snprintf");
@@ -239,7 +239,7 @@ tsetup(void)
 		err(1, "ioctl");
 
 	f.size = 32;
-	if (!(f.v = malloc(f.size*sizeof(struct field))))
+	if ((f.v = malloc(f.size*sizeof(struct field))) == NULL)
 		err(1, NULL);
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
@@ -253,7 +253,7 @@ tsetup(void)
 		if (++f.nmemb < f.size)
 			continue;
 		f.size *= 2;
-		if (!(f.v = realloc(f.v, f.size*sizeof(struct field))))
+		if ((f.v = realloc(f.v, f.size*sizeof(struct field))) == NULL)
 			err(1, NULL);
 	}
 
@@ -459,7 +459,7 @@ main(int argc, char *argv[])
 		errx(1, "invalid regular expression");
 
 	/* Ensure space for yank command and null terminator. */
-	if (!(yankargv = calloc(argc + 2, sizeof(const char *))))
+	if ((yankargv = calloc(argc + 2, sizeof(const char *))) == NULL)
 		err(1, NULL);
 	yankargv[0] = YANKCMD;
 	for (i = 0; i < argc; i++)
