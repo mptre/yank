@@ -88,7 +88,7 @@ input(void)
 
 	in.size = BUFSIZ;
 	if (!(in.v = malloc(in.size)))
-		err(1, "malloc");
+		err(1, NULL);
 
 	while ((n = read(0, in.v + in.nmemb, in.size - in.nmemb))) {
 		if (n < 0)
@@ -99,7 +99,7 @@ input(void)
 			continue;
 		in.size *= 2;
 		if (!(in.v = realloc(in.v, in.size)))
-			err(1, "realloc");
+			err(1, NULL);
 	}
 	memset(in.v + in.nmemb, 0, in.size - in.nmemb);
 }
@@ -117,7 +117,7 @@ ator(const char *s)
 
 	n = strlen(s) + strlen(f) + 1;
 	if (!(r = malloc(n)))
-		err(1, "malloc");
+		err(1, NULL);
 	if (snprintf(r, n, f, s) < 0)
 		err(1, "snprintf");
 
@@ -240,7 +240,7 @@ tsetup(void)
 
 	f.size = 32;
 	if (!(f.v = malloc(f.size*sizeof(struct field))))
-		err(1, "malloc");
+		err(1, NULL);
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
 	while (m && !regexec(&pattern, e, 1, &r, 0) && r.rm_eo - r.rm_so) {
@@ -254,7 +254,7 @@ tsetup(void)
 			continue;
 		f.size *= 2;
 		if (!(f.v = realloc(f.v, f.size*sizeof(struct field))))
-			err(1, "realloc");
+			err(1, NULL);
 	}
 
 	for (i = j = 0, s = e = in.v; n && i < ws.ws_row; i++) {
