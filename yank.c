@@ -59,11 +59,6 @@ static struct {
 } in;
 
 static struct {
-	size_t nmemb;
-	const char *v;
-} sel;
-
-static struct {
 	int rfd;
 	int wfd;
 	int ca;              /* use alternate screen */
@@ -73,13 +68,13 @@ static struct {
 static char *ator(const char *s);
 static int fcmp(const struct field *, const struct field *);
 static void input(void);
-static void yank(void);
+static void yank(const char *, size_t);
 __dead static void usage(void);
 
 static void tdraw(const char *, size_t, size_t, size_t);
 static void tend(void);
 static int tgetc(void);
-static void tmain(void);
+static const struct field *tmain(void);
 static void tputs(const char *);
 static void tsetup(void);
 static void twrite(const char *, size_t);
@@ -146,17 +141,14 @@ fcmp(const struct field *f1, const struct field *f2)
 }
 
 void
-yank(void)
+yank(const char *s, size_t nmemb)
 {
 	int fd[2];
-	int s;
+	int status;
 	pid_t pid;
 
-	if (!sel.v)
-		exit(1);
-
 	if (!isatty(1)) {
-		if (xwrite(1, sel.v, sel.nmemb) < 0)
+		if (xwrite(1, s, nmemb) < 0)
 			err(1, "write");
 		exit(0);
 	}
@@ -167,7 +159,7 @@ yank(void)
 		err(1, "dup2");
 	if (close(fd[0]) < 0)
 		err(1, "close");
-	if (xwrite(fd[1], sel.v, sel.nmemb) < 0)
+	if (xwrite(fd[1], s, nmemb) < 0)
 		err(1, "write");
 	if (close(fd[1]) < 0)
 		err(1, "close");
@@ -180,11 +172,11 @@ yank(void)
 		execvp(yankargv[0], (char * const *)yankargv);
 		err(126 + (errno == ENOENT), "%s", yankargv[0]);
 	default:
-		waitpid(pid, &s, 0);
-		if (WIFSIGNALED(s))
-			exit(128 + WTERMSIG(s));
-		if (WIFEXITED(s))
-			exit(WEXITSTATUS(s));
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status))
+			exit(128 + WTERMSIG(status));
+		if (WIFEXITED(status))
+			exit(WEXITSTATUS(status));
 	}
 }
 
@@ -344,7 +336,7 @@ tgetc(void)
 	return buf[0];
 }
 
-void
+const struct field *
 tmain(void)
 {
 	int c, i, j, k;
@@ -360,14 +352,12 @@ tmain(void)
 		c = tgetc();
 		switch (c) {
 		case '\n':
-			if (!f.nmemb)
+			if (f.nmemb == 0)
 				continue;
-			sel.nmemb = f.v[i].eo - f.v[i].so + 1;
-			sel.v = in.v + f.v[i].so;
-			/* FALLTHROUGH */
+			return &f.v[i];
 		case CONTROL('C'):
 		case CONTROL('D'):
-			return;
+			return NULL;
 		case CONTROL('A'):
 			j = 0;
 			break;
@@ -428,6 +418,7 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
+	const struct field *field;
 	char *s;
 	int c, i, rflags = REG_EXTENDED;
 
@@ -476,8 +467,12 @@ main(int argc, char *argv[])
 
 	input();
 	tsetup();
-	tmain();
+	field = tmain();
 	tend();
-	yank();
+
+	if (field == NULL)
+		return 1;
+	yank(in.v + field->so, field->eo - field->so + 1);
+
 	return 0;
 }
