@@ -65,23 +65,7 @@ static struct {
 	struct termios attr;
 } tty;
 
-static char *strtopat(const char *s);
-static int fcmp(const struct field *, const struct field *);
-static void input(void);
-static void yank(const char *, size_t);
-__dead static void usage(void);
-
-static void tdraw(const char *, size_t, size_t, size_t);
-static void tend(void);
-static int tgetc(void);
-static const struct field *tmain(void);
-static void tputs(const char *);
-static void tsetup(void);
-static void twrite(const char *, size_t);
-
-static ssize_t xwrite(int, const char *, size_t);
-
-void
+static void
 input(void)
 {
 	int n;
@@ -108,7 +92,7 @@ input(void)
  * Returns s transformed into a negation regular expression pattern concatenated
  * with the default delimiters.
  */
-char *
+static char *
 strtopat(const char *s)
 {
 	const char *f = "[^%s\f\n\r\t]+";
@@ -129,7 +113,7 @@ strtopat(const char *s)
  * otherwise. Both field start and end offsets are normalized with their
  * corresponding line offset.
  */
-int
+static int
 fcmp(const struct field *f1, const struct field *f2)
 {
 	size_t s1, s2, e1, e2;
@@ -140,7 +124,24 @@ fcmp(const struct field *f1, const struct field *f2)
 	return MAX(s1, s2) <= MIN(e1, e2) ? 0 : (e1 < s2 ? 1 : -1);
 }
 
-void
+static ssize_t
+xwrite(int fd, const char *s, size_t nmemb)
+{
+	ssize_t r;
+	size_t n = nmemb;
+
+	do {
+		r = write(fd, s, n);
+		if (r == -1)
+			return r;
+		n -= r;
+		s += r;
+	} while (n);
+
+	return nmemb;
+}
+
+static void
 yank(const char *s, size_t nmemb)
 {
 	int fd[2];
@@ -180,24 +181,22 @@ yank(const char *s, size_t nmemb)
 	}
 }
 
-ssize_t
-xwrite(int fd, const char *s, size_t nmemb)
+static void
+twrite(const char *s, size_t nmemb)
 {
-	ssize_t r;
-	size_t n = nmemb;
-
-	do {
-		r = write(fd, s, n);
-		if (r == -1)
-			return r;
-		n -= r;
-		s += r;
-	} while (n);
-
-	return nmemb;
+	if (xwrite(tty.wfd, s, nmemb) == -1)
+		err(1, "write");
 }
 
-void
+static void
+tputs(const char *s)
+{
+	size_t n = strlen(s);
+
+	twrite(s, n);
+}
+
+static void
 tdraw(const char *s, size_t nmemb, size_t start, size_t stop)
 {
 	twrite(s, start);
@@ -207,22 +206,7 @@ tdraw(const char *s, size_t nmemb, size_t start, size_t stop)
 	twrite(s + stop + 1, nmemb - stop);
 }
 
-void
-tputs(const char *s)
-{
-	size_t n = strlen(s);
-
-	twrite(s, n);
-}
-
-void
-twrite(const char *s, size_t nmemb)
-{
-	if (xwrite(tty.wfd, s, nmemb) == -1)
-		err(1, "write");
-}
-
-void
+static void
 tsetup(void)
 {
 	struct termios attr;
@@ -293,7 +277,7 @@ tsetup(void)
 	tputs(T_SAVE_CURSOR);
 }
 
-void
+static void
 tend(void)
 {
 	tputs(T_RESTORE_CURSOR);
@@ -306,7 +290,7 @@ tend(void)
 	close(tty.wfd);
 }
 
-int
+static int
 tgetc(void)
 {
 	static struct {
@@ -336,7 +320,7 @@ tgetc(void)
 	return buf[0];
 }
 
-const struct field *
+static const struct field *
 tmain(void)
 {
 	int c, i, j, k;
@@ -407,7 +391,7 @@ tmain(void)
 	}
 }
 
-void
+static void
 usage(void)
 {
 	fprintf(stderr, "usage: yank [-lx | -v] [-d delim] [-g pattern [-i]] "
