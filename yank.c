@@ -90,8 +90,8 @@ input(void)
 	if ((in.v = malloc(in.size)) == NULL)
 		err(1, NULL);
 
-	while ((n = read(0, in.v + in.nmemb, in.size - in.nmemb))) {
-		if (n < 0)
+	while ((n = read(0, in.v + in.nmemb, in.size - in.nmemb)) != 0) {
+		if (n == -1)
 			err(1, "read");
 		in.nmemb += n;
 
@@ -148,20 +148,20 @@ yank(const char *s, size_t nmemb)
 	pid_t pid;
 
 	if (!isatty(1)) {
-		if (xwrite(1, s, nmemb) < 0)
+		if (xwrite(1, s, nmemb) == -1)
 			err(1, "write");
 		exit(0);
 	}
 
-	if (pipe(fd) < 0)
+	if (pipe(fd) == -1)
 		err(1, "pipe");
-	if (dup2(fd[0], 0) < 0)
+	if (dup2(fd[0], 0) == -1)
 		err(1, "dup2");
-	if (close(fd[0]) < 0)
+	if (close(fd[0]) == -1)
 		err(1, "close");
-	if (xwrite(fd[1], s, nmemb) < 0)
+	if (xwrite(fd[1], s, nmemb) == -1)
 		err(1, "write");
-	if (close(fd[1]) < 0)
+	if (close(fd[1]) == -1)
 		err(1, "close");
 	pid = fork();
 	switch (pid) {
@@ -188,7 +188,7 @@ xwrite(int fd, const char *s, size_t nmemb)
 
 	do {
 		r = write(fd, s, n);
-		if (r < 0)
+		if (r == -1)
 			return r;
 		n -= r;
 		s += r;
@@ -218,7 +218,7 @@ tputs(const char *s)
 void
 twrite(const char *s, size_t nmemb)
 {
-	if (xwrite(tty.wfd, s, nmemb) < 0)
+	if (xwrite(tty.wfd, s, nmemb) == -1)
 		err(1, "write");
 }
 
@@ -232,10 +232,10 @@ tsetup(void)
 	size_t m, n, w;
 	unsigned int i, j;
 
-	if (!(tty.rfd = open("/dev/tty", O_RDONLY)))
+	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
 		err(1, "open");
 
-	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) < 0)
+	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) == -1)
 		err(1, "ioctl");
 
 	f.size = 32;
@@ -279,7 +279,7 @@ tsetup(void)
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
 	tcsetattr(tty.rfd, TCSANOW, &attr);
 
-	if (!(tty.wfd = open("/dev/tty", O_WRONLY)))
+	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
 		err(1, "open");
 
 	if (tty.ca)
@@ -324,7 +324,7 @@ tgetc(void)
 	int i;
 
 	n = read(tty.rfd, buf, sizeof(buf));
-	if (n < 0)
+	if (n == -1)
 		err(1, "read");
 	if (n > 2) {
 		for (i = 0; keys[i].s; i++)
