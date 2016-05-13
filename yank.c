@@ -37,9 +37,9 @@
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 struct field {
-	size_t so; /* start offset */
-	size_t eo; /* end offset */
-	size_t lo; /* line offset */
+	size_t	so; /* start offset */
+	size_t	eo; /* end offset */
+	size_t	lo; /* line offset */
 };
 
 static regex_t pattern;
@@ -47,28 +47,28 @@ static regex_t pattern;
 static const char **yankargv;
 
 static struct {
-	size_t nmemb;
-	size_t size;
-	struct field *v;
+	size_t	nmemb;
+	size_t	size;
+	struct	field *v;
 } f;
 
 static struct {
-	size_t size;
-	size_t nmemb;
-	char *v;
+	size_t	size;
+	size_t	nmemb;
+	char	*v;
 } in;
 
 static struct {
-	int rfd;
-	int wfd;
-	int ca;              /* use alternate screen */
-	struct termios attr;
+	int		rfd;
+	int		wfd;
+	int		ca;	/* use alternate screen */
+	struct termios	attr;
 } tty;
 
 static void
 input(void)
 {
-	int n;
+	int	n;
 
 	in.size = BUFSIZ;
 	if ((in.v = malloc(in.size)) == NULL)
@@ -95,9 +95,9 @@ input(void)
 static char *
 strtopat(const char *s)
 {
-	const char *f = "[^%s\f\n\r\t]+";
-	char *r;
-	size_t n;
+	const char	*f = "[^%s\f\n\r\t]+";
+	char		*r;
+	size_t		n;
 
 	n = strlen(s) + strlen(f) + 1;
 	if ((r = malloc(n)) == NULL)
@@ -116,7 +116,7 @@ strtopat(const char *s)
 static int
 fcmp(const struct field *f1, const struct field *f2)
 {
-	size_t s1, s2, e1, e2;
+	size_t	s1, s2, e1, e2;
 
 	s1 = f1->so - f1->lo, e1 = f1->eo - f1->lo;
 	s2 = f2->so - f2->lo, e2 = f2->eo - f2->lo;
@@ -127,9 +127,10 @@ fcmp(const struct field *f1, const struct field *f2)
 static ssize_t
 xwrite(int fd, const char *s, size_t nmemb)
 {
-	ssize_t r;
-	size_t n = nmemb;
+	ssize_t	r;
+	size_t	n;
 
+	n = nmemb;
 	do {
 		r = write(fd, s, n);
 		if (r == -1)
@@ -144,9 +145,9 @@ xwrite(int fd, const char *s, size_t nmemb)
 static void
 yank(const char *s, size_t nmemb)
 {
-	int fd[2];
-	int status;
-	pid_t pid;
+	int	fd[2];
+	int	status;
+	pid_t	pid;
 
 	if (!isatty(1)) {
 		if (xwrite(1, s, nmemb) == -1)
@@ -191,8 +192,9 @@ twrite(const char *s, size_t nmemb)
 static void
 tputs(const char *s)
 {
-	size_t n = strlen(s);
+	size_t	n;
 
+	n = strlen(s);
 	twrite(s, n);
 }
 
@@ -209,12 +211,12 @@ tdraw(const char *s, size_t nmemb, size_t start, size_t stop)
 static void
 tsetup(void)
 {
-	struct termios attr;
-	struct winsize ws;
-	regmatch_t r;
-	char *s, *e;
-	size_t m, n, w;
-	unsigned int i, j;
+	struct termios	attr;
+	struct winsize	ws;
+	regmatch_t	r;
+	char		*s, *e;
+	size_t		m, n, w;
+	unsigned int	i, j;
 
 	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
 		err(1, "open");
@@ -294,18 +296,18 @@ static int
 tgetc(void)
 {
 	static struct {
-		const char *s;
-		int c;
+		const char	*s;
+		int		c;
 	} keys[] = {
-		{ T_KEY_UP,    KEY_UP    },
-		{ T_KEY_RIGHT, KEY_RIGHT },
-		{ T_KEY_DOWN,  KEY_DOWN  },
-		{ T_KEY_LEFT,  KEY_LEFT  },
-		{ NULL,        0         },
+		{ T_KEY_UP,	KEY_UP },
+		{ T_KEY_RIGHT,	KEY_RIGHT },
+		{ T_KEY_DOWN,	KEY_DOWN },
+		{ T_KEY_LEFT,	KEY_LEFT },
+		{ NULL,		0 },
 	};
-	char buf[3];
-	ssize_t n;
-	int i;
+	char	buf[3];
+	ssize_t	n;
+	int	i;
 
 	n = read(tty.rfd, buf, sizeof(buf));
 	if (n == -1)
@@ -323,8 +325,8 @@ tgetc(void)
 static const struct field *
 tmain(void)
 {
-	int c, i, j, k;
-	size_t n;
+	size_t	n;
+	int	c, i, j, k;
 
 	i = j = 0;
 	n = f.v[f.nmemb].lo;
@@ -402,9 +404,9 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	const struct field *field;
-	char *s;
-	int c, i, rflags = REG_EXTENDED;
+	const struct field	*field;
+	char			*s;
+	int			c, i, rflags = REG_EXTENDED;
 
 #ifdef __OpenBSD__
 	if (pledge("stdio rpath proc exec tty", NULL) == -1)
