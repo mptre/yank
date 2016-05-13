@@ -9,7 +9,7 @@ CFLAGS+=	-pedantic -Wall -Werror -Wextra
 CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 yank: yank.c
-	${CC} ${CFLAGS} $< -o $@ ${LDFLAGS} ${CPPFLAGS}
+	${CC} ${CFLAGS} -o $@ $< ${LDFLAGS} ${CPPFLAGS}
 
 clean:
 	rm yank
