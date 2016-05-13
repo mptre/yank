@@ -65,7 +65,7 @@ static struct {
 	struct termios attr;
 } tty;
 
-static char *ator(const char *s);
+static char *strtopat(const char *s);
 static int fcmp(const struct field *, const struct field *);
 static void input(void);
 static void yank(const char *, size_t);
@@ -105,11 +105,11 @@ input(void)
 }
 
 /*
- * Returns s transformed into a negation regular expression concatenated with
- * the default delimiters.
+ * Returns s transformed into a negation regular expression pattern concatenated
+ * with the default delimiters.
  */
 char *
-ator(const char *s)
+strtopat(const char *s)
 {
 	const char *f = "[^%s\f\n\r\t]+";
 	char *r;
@@ -429,12 +429,12 @@ main(int argc, char *argv[])
 
 	setlocale(LC_CTYPE, "");
 
-	s = ator(" ");
+	s = strtopat(" ");
 	while ((c = getopt(argc, argv, "ilvxd:g:")) != -1)
 		switch (c) {
 		case 'd':
 			free(s);
-			s = ator(optarg);
+			s = strtopat(optarg);
 			break;
 		case 'g':
 			free(s);
@@ -446,7 +446,7 @@ main(int argc, char *argv[])
 			break;
 		case 'l':
 			free(s);
-			s = ator("");
+			s = strtopat("");
 			break;
 		case 'v':
 			puts("yank " VERSION);
