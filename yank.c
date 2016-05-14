@@ -176,7 +176,8 @@ yank(const char *s, size_t nmemb)
 		err(126 + (errno == ENOENT), "%s", yankargv[0]);
 		/* NOTREACHED */
 	default:
-		waitpid(pid, &status, 0);
+		if (waitpid(pid, &status, 0) == -1)
+			err(1, "waitpid");
 		if (WIFSIGNALED(status))
 			exit(128 + WTERMSIG(status));
 		if (WIFEXITED(status))
