@@ -42,7 +42,7 @@ struct field {
 	size_t	lo; /* line offset */
 };
 
-static regex_t pattern;
+static regex_t reg;
 
 static const char **yankargv;
 
@@ -95,17 +95,17 @@ input(void)
 static char *
 strtopat(const char *s)
 {
-	const char	*f = "[^%s\f\n\r\t]+";
-	char		*r;
+	const char	*fmt = "[^%s\f\n\r\t]+";
+	char		*pat;
 	size_t		n;
 
-	n = strlen(s) + strlen(f) + 1;
-	if ((r = malloc(n)) == NULL)
+	n = strlen(s) + strlen(fmt) + 1;
+	if ((pat = malloc(n)) == NULL)
 		err(1, NULL);
-	if (snprintf(r, n, f, s) < 0)
+	if (snprintf(pat, n, fmt, s) < 0)
 		err(1, "snprintf");
 
-	return r;
+	return pat;
 }
 
 /*
@@ -229,7 +229,7 @@ tsetup(void)
 		err(1, NULL);
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
 	s = e = in.v;
-	while (m && !regexec(&pattern, e, 1, &r, 0) && r.rm_eo - r.rm_so) {
+	while (m && !regexec(&reg, e, 1, &r, 0) && r.rm_eo - r.rm_so) {
 		f.v[f.nmemb].so = f.v[f.nmemb].eo = e - s;
 		f.v[f.nmemb].so += r.rm_so;
 		f.v[f.nmemb].eo += MAX(MIN(r.rm_eo, (ssize_t)m) - 1, 0);
@@ -405,7 +405,7 @@ int
 main(int argc, char *argv[])
 {
 	const struct field	*field;
-	char			*s;
+	char			*pat;
 	int			c, i, rflags = REG_EXTENDED;
 
 #ifdef __OpenBSD__
@@ -415,24 +415,24 @@ main(int argc, char *argv[])
 
 	setlocale(LC_CTYPE, "");
 
-	s = strtopat(" ");
+	pat = strtopat(" ");
 	while ((c = getopt(argc, argv, "ilvxd:g:")) != -1)
 		switch (c) {
 		case 'd':
-			free(s);
-			s = strtopat(optarg);
+			free(pat);
+			pat = strtopat(optarg);
 			break;
 		case 'g':
-			free(s);
-			s = optarg;
+			free(pat);
+			pat = optarg;
 			rflags |= REG_NEWLINE;
 			break;
 		case 'i':
 			rflags |= REG_ICASE;
 			break;
 		case 'l':
-			free(s);
-			s = strtopat("");
+			free(pat);
+			pat = strtopat("");
 			break;
 		case 'v':
 			puts("yank " VERSION);
@@ -446,7 +446,7 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	if (regcomp(&pattern, s, rflags) != 0)
+	if (regcomp(&reg, pat, rflags) != 0)
 		errx(1, "invalid regular expression");
 
 	/* Ensure space for yank command and null terminator. */
