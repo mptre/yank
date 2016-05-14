@@ -45,7 +45,7 @@ struct field {
 
 static regex_t reg;
 
-static const char **yankargv;
+static char **yankargv;
 
 static struct {
 	size_t	nmemb;
@@ -172,7 +172,7 @@ yank(const char *s, size_t nmemb)
 		err(1, "fork");
 		/* NOTREACHED */
 	case 0:
-		execvp(yankargv[0], (char * const *)yankargv);
+		execvp(yankargv[0], yankargv);
 		err(126 + (errno == ENOENT), "%s", yankargv[0]);
 		/* NOTREACHED */
 	default:
@@ -452,7 +452,7 @@ main(int argc, char *argv[])
 		errx(1, "invalid regular expression");
 
 	/* Ensure space for yank command and null terminator. */
-	if ((yankargv = calloc(argc + 2, sizeof(const char *))) == NULL)
+	if ((yankargv = calloc(argc + 2, sizeof(char *))) == NULL)
 		err(1, NULL);
 	yankargv[0] = YANKCMD;
 	for (i = 0; i < argc; i++)
