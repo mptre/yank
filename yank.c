@@ -264,7 +264,7 @@ tsetup(void)
 	f.v[f.nmemb].lo = MAX(s - in.v - 1, 0);
 
 	tcgetattr(tty.rfd, &tty.attr);
-	memcpy(&attr, &tty.attr, sizeof(struct termios));
+	attr = tty.attr;
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
 	tcsetattr(tty.rfd, TCSANOW, &attr);
 
