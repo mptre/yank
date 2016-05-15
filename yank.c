@@ -263,10 +263,12 @@ tsetup(void)
 	/* Number of bytes to output. */
 	f.v[f.nmemb].lo = MAX(s - in.v - 1, 0);
 
-	tcgetattr(tty.rfd, &tty.attr);
+	if (tcgetattr(tty.rfd, &tty.attr) == -1)
+		err(1, "tcgetattr");
 	attr = tty.attr;
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
-	tcsetattr(tty.rfd, TCSANOW, &attr);
+	if (tcsetattr(tty.rfd, TCSANOW, &attr) == -1)
+		err(1, "tcsetattr");
 
 	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
 		err(1, "open");
