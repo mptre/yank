@@ -202,16 +202,6 @@ tputs(const char *s)
 }
 
 static void
-tdraw(const char *s, size_t nmemb, size_t start, size_t stop)
-{
-	twrite(s, start);
-	tputs(T_ENTER_STANDOUT_MODE);
-	twrite(s + start, stop - start + 1);
-	tputs(T_EXIT_STANDOUT_MODE);
-	twrite(s + stop + 1, nmemb - stop);
-}
-
-static void
 tsetup(void)
 {
 	struct termios	attr;
@@ -334,16 +324,23 @@ tmain(void)
 
 	i = j = 0;
 	n = f.v[f.nmemb].lo;
-	if (f.nmemb)
-		tdraw(in.v, n, f.v[0].so, f.v[0].eo);
-	else
-		twrite(in.v, n);
 	for (;;) {
+		tputs(T_RESTORE_CURSOR);
+		if (f.nmemb > 0) {
+			twrite(in.v, f.v[i].so);
+			tputs(T_ENTER_STANDOUT_MODE);
+			twrite(in.v + f.v[i].so, f.v[i].eo - f.v[i].so + 1);
+			tputs(T_EXIT_STANDOUT_MODE);
+			twrite(in.v + f.v[i].eo + 1, n - f.v[i].eo);
+		} else {
+			twrite(in.v, n);
+		}
+
 		c = tgetc();
 		switch (c) {
 		case '\n':
 			if (f.nmemb == 0)
-				continue;
+				break;
 			return &f.v[i];
 		case CONTROL('C'):
 		case CONTROL('D'):
@@ -370,7 +367,7 @@ tmain(void)
 			while (j < (ssize_t)f.nmemb && f.v[i].lo == f.v[j].lo)
 				j++;
 			if (j == (ssize_t)f.nmemb)
-				continue;
+				break;
 			/* FALLTHROUGH */
 		if (0) {
 		case KEY_UP:
@@ -386,14 +383,9 @@ tmain(void)
 			     && f.v[j].lo == f.v[j + 1].lo; j++)
 				/* NOP */;
 			break;
-		default:
-			continue;
 		}
-		if (j < 0 || j >= (ssize_t)f.nmemb)
-			continue;
-		i = j;
-		tputs(T_RESTORE_CURSOR);
-		tdraw(in.v, n, f.v[i].so, f.v[i].eo);
+		if (j >= 0 && j < (ssize_t)f.nmemb)
+			i = j;
 	}
 }
 
