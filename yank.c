@@ -223,6 +223,8 @@ tsetup(void)
 
 	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
 		err(1, "open");
+	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
+		err(1, "open");
 
 	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) == -1)
 		err(1, "ioctl");
@@ -269,9 +271,6 @@ tsetup(void)
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
 	if (tcsetattr(tty.rfd, TCSANOW, &attr) == -1)
 		err(1, "tcsetattr");
-
-	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
-		err(1, "open");
 
 	if (tty.ca)
 		tputs(T_ENTER_CA_MODE);
