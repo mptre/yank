@@ -1,3 +1,10 @@
+v0.7.0 - 2016-05-18
+===================
+
+- Add MANPREFIX support to installation task (Anton Lindqvist)
+
+- Pledge on OpenBSD (Anton Lindqvist)
+
 v0.6.4 - 2016-03-13
 ===================
 
