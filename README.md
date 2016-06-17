@@ -97,11 +97,15 @@ On testing and unstable:
 
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 
+Maintainer: Sébastien Delafond <sdelafond () gmail ! com>
+
 ### OS X
 
   ```
   brew install yank
   ```
+
+Maintainer: Carl Dong <dongcarl () fastmail ! fm>
 
 ### From source
 
