@@ -9,7 +9,7 @@
 .Op Fl lx | v
 .Op Fl d Ar delim
 .Op Fl g Ar pattern Op Fl i
-.Op Fl - Ar command Op Ar argument ...
+.Op Fl - Ar command Op Ar args
 .Sh DESCRIPTION
 Read input from
 .Pa stdin
@@ -25,13 +25,15 @@ Using the arrow keys will move the selected field. The interface support several
 Emacs and Vi like key bindings, see
 .Em COMMANDS .
 Pressing the return key will invoke the yank command and write the selected
-field to the its
+field to its
 .Pa stdin .
 The yank command defaults to
 .Xr xsel 1
 but could be anything that accepts input on
 .Pa stdin .
-When invoking yank everything supplied after the
+When invoking
+.Nm
+everything supplied after the
 .Fl -
 option will be used as the yank command, see
 .Em EXAMPLES .
@@ -57,11 +59,11 @@ use the default delimiters except for space, see
 prints version
 .It Fl x
 use alternate screen
-.It Fl - Ar command Op Ar argument ...
+.It Fl - Ar command Op Ar args
 use
 .Ar command
 with zero or more
-.Ar argument
+.Ar args
 as the yank command
 .El
 .Sh COMMANDS

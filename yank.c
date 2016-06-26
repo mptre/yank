@@ -393,7 +393,7 @@ static void
 usage(void)
 {
 	fprintf(stderr, "usage: yank [-lx | -v] [-d delim] [-g pattern [-i]] "
-	    "[-- command [argument ...]]\n");
+	    "[-- command [args]]\n");
 	exit(2);
 }
 
