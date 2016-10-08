@@ -1,3 +1,20 @@
+vX.Y.Z - YYYY-MM-DD
+===================
+
+- Update man page (2e78c28, a5cdba9) (Anton Lindqvist)
+
+- Consolidate key bindings (5b4a840) (Anton Lindqvist)
+
+- Fix `snprintf(3)` return value check (9fbf248) (Anton Lindqvist)
+
+- Improve error messages (89be934) (Anton Lindqvist)
+
+- Fix segfault when no fields are found (f3ef1ea) (Anton Lindqvist)
+
+- Add Vi goto `g` and `G` key bindings (859f27b) (Anton Lindqvist)
+
+- Refactoring and cleanup (2017de6) (Anton Lindqvist)
+
 v0.7.0 - 2016-05-18
 ===================
 
