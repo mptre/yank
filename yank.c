@@ -302,6 +302,8 @@ tgetc(void)
 		{ "\005",	KEY_END },	/* Ctrl-E */
 		{ "\016",	KEY_RIGHT },	/* Ctrl-N */
 		{ "\020",	KEY_LEFT },	/* Ctrl-P */
+		{ "G",		KEY_END },
+		{ "g",		KEY_HOME },
 		{ "h",		KEY_LEFT },
 		{ "j",		KEY_DOWN },
 		{ "k",		KEY_UP },
