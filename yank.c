@@ -352,9 +352,9 @@ tmain(void)
 		c = tgetc();
 		switch (c) {
 		case KEY_ENTER:
-			if (f.nmemb == 0)
-				break;
-			return &f.v[i];
+			if (f.nmemb > 0)
+				return &f.v[i];
+			break;
 		case KEY_TERM:
 			return NULL;
 		case KEY_HOME:
@@ -462,7 +462,6 @@ main(int argc, char *argv[])
 	tsetup();
 	field = tmain();
 	tend();
-
 	if (field == NULL)
 		return 1;
 	yank(in.v + field->so, field->eo - field->so + 1);
