@@ -213,12 +213,12 @@ tsetup(void)
 	unsigned int	i, j;
 
 	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
-		err(1, "open");
+		err(1, "/dev/tty");
 	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
-		err(1, "open");
+		err(1, "/dev/tty");
 
 	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) == -1)
-		err(1, "ioctl");
+		err(1, "TIOCGWINSZ");
 
 	f.size = 32;
 	if ((f.v = malloc(f.size*sizeof(struct field))) == NULL)
