@@ -1,4 +1,4 @@
-vX.Y.Z - YYYY-MM-DD
+v0.7.1 - 2016-10-08
 ===================
 
 - Update man page (2e78c28, a5cdba9) (Anton Lindqvist)
