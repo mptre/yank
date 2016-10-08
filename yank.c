@@ -13,11 +13,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define KEY_DOWN  0x100
-#define KEY_LEFT  0x101
-#define KEY_RIGHT 0x102
-#define KEY_UP    0x103
-
 /* Terminal capabilities */
 #define T_CLR_EOS             "\033[J"
 #define T_CURSOR_INVISIBLE    "\033[?25l"
@@ -26,16 +21,22 @@
 #define T_ENTER_STANDOUT_MODE "\033[7m"
 #define T_EXIT_CA_MODE        "\033[?1049l"
 #define T_EXIT_STANDOUT_MODE  "\033[0m"
-#define T_KEY_DOWN            "\033[B"
-#define T_KEY_LEFT            "\033[D"
-#define T_KEY_RIGHT           "\033[C"
-#define T_KEY_UP              "\033[A"
 #define T_RESTORE_CURSOR      "\0338"
 #define T_SAVE_CURSOR         "\0337"
 
-#define CONTROL(c) (c^0x40)
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
+
+enum {
+	KEY_ENTER = 1,
+	KEY_HOME,
+	KEY_END,
+	KEY_TERM,
+	KEY_UP,
+	KEY_RIGHT,
+	KEY_DOWN,
+	KEY_LEFT
+};
 
 struct field {
 	size_t	so; /* start offset */
@@ -269,7 +270,7 @@ tsetup(void)
 	for (j = 0; j < i; j++)
 		tputs("\n");
 	for (j = 0; j < i; j++)
-		tputs(T_KEY_UP);
+		tputs("\033M");
 	tputs(T_SAVE_CURSOR);
 }
 
@@ -292,11 +293,22 @@ tgetc(void)
 	static struct {
 		const char	*s;
 		int		c;
-	} keys[] = {
-		{ T_KEY_UP,	KEY_UP },
-		{ T_KEY_RIGHT,	KEY_RIGHT },
-		{ T_KEY_DOWN,	KEY_DOWN },
-		{ T_KEY_LEFT,	KEY_LEFT },
+	}	keys[] = {
+		{ "\n",		KEY_ENTER },
+		{ "\001",	KEY_HOME },	/* Ctrl-A */
+		{ "\003",	KEY_TERM },	/* Ctrl-C */
+		{ "\004",	KEY_TERM },	/* Ctrl-D */
+		{ "\005",	KEY_END },	/* Ctrl-E */
+		{ "\016",	KEY_RIGHT },	/* Ctrl-N */
+		{ "\020",	KEY_LEFT },	/* Ctrl-P */
+		{ "h",		KEY_LEFT },
+		{ "j",		KEY_DOWN },
+		{ "k",		KEY_UP },
+		{ "l",		KEY_RIGHT },
+		{ "\033[A",	KEY_UP },
+		{ "\033[C",	KEY_RIGHT },
+		{ "\033[B",	KEY_DOWN },
+		{ "\033[D",	KEY_LEFT },
 		{ NULL,		0 },
 	};
 	char	buf[3];
@@ -306,14 +318,14 @@ tgetc(void)
 	n = read(tty.rfd, buf, sizeof(buf));
 	if (n == -1)
 		err(1, "read");
-	if (n > 2) {
-		for (i = 0; keys[i].s; i++)
-			if (strncmp(keys[i].s, buf, n) == 0)
-				return keys[i].c;
-		return 0;
-	}
+	if (n == 0)
+		return KEY_TERM;	/* EOF */
 
-	return buf[0];
+	for (i = 0; keys[i].s != NULL; i++)
+		if (strncmp(keys[i].s, buf, n) == 0)
+			return keys[i].c;
+
+	return 0;
 }
 
 static const struct field *
@@ -338,31 +350,25 @@ tmain(void)
 
 		c = tgetc();
 		switch (c) {
-		case '\n':
+		case KEY_ENTER:
 			if (f.nmemb == 0)
 				break;
 			return &f.v[i];
-		case CONTROL('C'):
-		case CONTROL('D'):
+		case KEY_TERM:
 			return NULL;
-		case CONTROL('A'):
+		case KEY_HOME:
 			j = 0;
 			break;
-		case CONTROL('N'):
 		case KEY_RIGHT:
-		case 'l':
 			j = i + 1;
 			break;
-		case CONTROL('E'):
+		case KEY_END:
 			j = f.nmemb - 1;
 			break;
-		case CONTROL('P'):
 		case KEY_LEFT:
-		case 'h':
 			j = i - 1;
 			break;
 		case KEY_DOWN:
-		case 'j':
 			j = i;
 			while (j < (ssize_t)f.nmemb && f.v[i].lo == f.v[j].lo)
 				j++;
@@ -371,7 +377,6 @@ tmain(void)
 			/* FALLTHROUGH */
 		if (0) {
 		case KEY_UP:
-		case 'k':
 			k = i;
 			while (k && f.v[i].lo == f.v[k].lo)
 				k--;
