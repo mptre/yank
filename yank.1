@@ -14,15 +14,16 @@
 Read input from
 .Pa stdin
 and display a selection interface that allows a field to be selected and copied
-to the clipboard. Fields are either recognized by a regular expression using the
+to the clipboard.
+Fields are either recognized by a regular expression using the
 .Fl g
 option or by splitting the input on a delimiter sequence using the
 .Fl d
 option, see
 .Em DELIMITERS .
 .Pp
-Using the arrow keys will move the selected field. The interface support several
-Emacs and Vi like key bindings, see
+Using the arrow keys will move the selected field.
+The interface support several Emacs and Vi like key bindings, see
 .Em COMMANDS .
 Pressing the return key will invoke the yank command and write the selected
 field to its
@@ -123,7 +124,8 @@ If
 .Pa stdout
 is not a terminal the selected field will be written to
 .Pa stdout
-and exit without invoking the yank command. Kill the selected PID:
+and exit without invoking the yank command.
+Kill the selected PID:
 .Pp
 .Dl ps ux | yank -g [0-9]+ | xargs kill
 .Pp
