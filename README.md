@@ -16,7 +16,7 @@ delimiter sequence using the `-d` option.
 Using the arrow keys will move the selected field. The interface supports
 several Emacs and Vi like key bindings, consult the man page for further
 reference. Pressing the return key will invoke the yank command and write the
-selected field to its `stdin`. The yank command defaults to xsel[1] but could be
+selected field to its `stdin`. The yank command defaults to [xsel] but could be
 anything that accepts input on `stdin`. When invoking yank everything supplied
 after the `--` option will be used as the yank command, see examples below. The
 default yank command can also be defined at compile time, see compilation below.
@@ -121,4 +121,4 @@ Change the install directory using the `PREFIX` variable:
   make PREFIX=DIR install
   ```
 
-[1] http://www.vergenet.net/~conrad/software/xsel/
+[xsel]: http://www.vergenet.net/~conrad/software/xsel/
