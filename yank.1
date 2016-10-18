@@ -89,7 +89,7 @@ and
 .Fl g
 options are omitted the following characters are recognized as delimiters by
 default:
-.Bl -tag -width -indent
+.Bl -tag -width XXXX
 .It \ef
 form feed
 .It \en
@@ -107,18 +107,15 @@ If the
 option is present space is not recognized as a delimiter.
 .Sh EXAMPLES
 Yank a environment variable key or value:
-.Pp
-.Dl env | yank -d =
+.Dl $ env | yank -d =
 .Pp
 Yank a field from a CSV file:
-.Pp
-.Dl yank -d \e\&", <file.csv
+.Dl $ yank -d \e\&", <file.csv
 .Pp
 Yank a whole line using the
 .Fl l
 option:
-.Pp
-.Dl make 2>&1 | yank -l
+.Dl $ make 2>&1 | yank -l
 .Pp
 If
 .Pa stdout
@@ -126,13 +123,11 @@ is not a terminal the selected field will be written to
 .Pa stdout
 and exit without invoking the yank command.
 Kill the selected PID:
-.Pp
-.Dl ps ux | yank -g [0-9]+ | xargs kill
+.Dl $ ps ux | yank -g [0-9]+ | xargs kill
 .Pp
 Yank the selected field to the clipboard as opposed of the default primary
 clipboard:
-.Pp
-.Dl yank -- xsel -b
+.Dl $ yank -- xsel -b
 .Sh DIAGNOSTICS
 .Ex -std
 .Sh SEE ALSO
