@@ -22,8 +22,7 @@ option or by splitting the input on a delimiter sequence using the
 option, see
 .Em DELIMITERS .
 .Pp
-Using the arrow keys will move the selected field.
-The interface support several Emacs and Vi like key bindings, see
+Using the arrow keys will move the selected field, see
 .Em COMMANDS .
 Pressing the return key will invoke the yank command and write the selected
 field to its
@@ -38,34 +37,35 @@ everything supplied after the
 .Fl -
 option will be used as the yank command, see
 .Em EXAMPLES .
-.Sh OPTIONS
-.Bl -tag -width -indent
+.Pp
+The options are as follows:
+.Bl -tag -width "-- command [args]"
 .It Fl d Ar delim
-all input characters not present in
+All input characters not present in
 .Ar delim
 will be recognized as fields, see
-.Em DELIMITERS
+.Em DELIMITERS .
 .It Fl g Ar pattern
-use the regular expression
+Use
 .Ar pattern
-to recognize fields expressed as a to POSIX extended regular expression
+to recognize fields, expressed as a POSIX extended regular expression.
 .It Fl i
-ignore case differences between
+Ignore case differences between
 .Ar pattern
-and the input
+and the input.
 .It Fl l
-use the default delimiters except for space, see
-.Em DELIMITERS
+Use the default delimiters except for space, see
+.Em DELIMITERS .
 .It Fl v
-prints version
+Prints version.
 .It Fl x
-use alternate screen
+Use alternate screen.
 .It Fl - Ar command Op Ar args
-use
+Use
 .Ar command
 with zero or more
 .Ar args
-as the yank command
+as the yank command.
 .El
 .Sh COMMANDS
 .Bl -tag -width XXXX
@@ -138,4 +138,4 @@ clipboard:
 .Sh SEE ALSO
 .Xr re_format 7
 .Sh AUTHORS
-.An "Anton Lindqvist" Aq anton.lindqvist@gmail.com
+.An Anton Lindqvist Aq Mt anton.lindqvist@gmail.com
