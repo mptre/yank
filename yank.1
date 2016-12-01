@@ -9,7 +9,7 @@
 .Op Fl lx | v
 .Op Fl d Ar delim
 .Op Fl g Ar pattern Op Fl i
-.Op Fl - Ar command Op Ar args
+.Op Fl - Ar command Op Ar argument ...
 .Sh DESCRIPTION
 Read input from
 .Pa stdin
@@ -24,22 +24,21 @@ option, see
 .Pp
 Using the arrow keys will move the selected field, see
 .Em COMMANDS .
-Pressing the return key will invoke the yank command and write the selected
-field to its
+Pressing the return key will invoke
+.Ar command
+and write the selected field to its
 .Pa stdin .
-The yank command defaults to
+The
+.Ar command
+defaults to
 .Xr xsel 1
 but could be anything that accepts input on
-.Pa stdin .
-When invoking
-.Nm
-everything supplied after the
-.Fl -
-option will be used as the yank command, see
+.Pa stdin ,
+see
 .Em EXAMPLES .
 .Pp
 The options are as follows:
-.Bl -tag -width "-- command [args]"
+.Bl -tag -width Ds
 .It Fl d Ar delim
 All input characters not present in
 .Ar delim
@@ -60,7 +59,7 @@ Use the default delimiters except for space, see
 Prints version.
 .It Fl x
 Use alternate screen.
-.It Fl - Ar command Op Ar args
+.It Fl - Ar command Op Ar argument ...
 Use
 .Ar command
 with zero or more
