@@ -1,3 +1,8 @@
+vX.Y.Z - YYYY-MM-DD
+===================
+
+- Update man page and README (9eac46f, 252a419) (Anton Lindqvist)
+
 v0.7.1 - 2016-10-08
 ===================
 
