@@ -3,6 +3,8 @@ vX.Y.Z - YYYY-MM-DD
 
 - Update man page and README (9eac46f, 252a419) (Anton Lindqvist)
 
+- Add Arch Linux install instructions to README (#32) (Javier Tiá)
+
 v0.7.1 - 2016-10-08
 ===================
 
