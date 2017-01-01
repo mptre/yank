@@ -92,6 +92,16 @@ file.
 Installation
 ------------
 
+### Arch Linux
+
+On AUR:
+
+```
+yaourt -S yank
+```
+
+Maintainer: Javier Tiá <javier.tia () gmail ! com>
+
 ### Debian
 
 On testing and unstable:
