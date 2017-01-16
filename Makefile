@@ -17,14 +17,10 @@ clean:
 	rm yank
 
 install: yank
-	@echo "yank -> ${PREFIX}/bin/yank"
-	@mkdir -p "${PREFIX}/bin"
-	@cp -f yank "${PREFIX}/bin"
-	@chmod 755 "${PREFIX}/bin/yank"
-	@echo "yank.1 -> ${MANPREFIX}/man1/yank.1"
-	@mkdir -p "${MANPREFIX}/man1"
-	@cp -f yank.1 "${MANPREFIX}/man1/yank.1"
-	@chmod 644 "${MANPREFIX}/man1/yank.1"
+	@mkdir -p ${PREFIX}/bin
+	@mkdir -p ${MANPREFIX}/man1
+	install -m 0755 yank ${PREFIX}/bin
+	install -m 0644 yank.1 ${MANPREFIX}/man1
 
 .PHONY: all clean install
 
