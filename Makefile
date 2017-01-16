@@ -5,6 +5,9 @@ YANKCMD=	xsel
 PREFIX=		/usr/local
 MANPREFIX=	${PREFIX}/share/man
 
+INSTALL_PROGRAM=	install -s -m 0755
+INSTALL_MAN=		install -m 0644
+
 CFLAGS+=	-pedantic -Wall -Werror -Wextra
 CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
@@ -19,8 +22,8 @@ clean:
 install: yank
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	install -m 0755 yank ${DESTDIR}${PREFIX}/bin
-	install -m 0644 yank.1 ${DESTDIR}${MANPREFIX}/man1
+	${INSTALL_PROGRAM} yank ${DESTDIR}${PREFIX}/bin
+	${INSTALL_MAN} yank.1 ${DESTDIR}${MANPREFIX}/man1
 
 .PHONY: all clean install
 
