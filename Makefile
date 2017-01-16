@@ -8,6 +8,8 @@ MANPREFIX=	${PREFIX}/share/man
 CFLAGS+=	-pedantic -Wall -Werror -Wextra
 CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
+all: yank
+
 yank: yank.c
 	${CC} ${CFLAGS} -o $@ $< ${LDFLAGS} ${CPPFLAGS}
 
@@ -24,6 +26,6 @@ install: yank
 	@cp -f yank.1 "${MANPREFIX}/man1/yank.1"
 	@chmod 644 "${MANPREFIX}/man1/yank.1"
 
-.PHONY: clean install
+.PHONY: all clean install
 
 -include config.mk
