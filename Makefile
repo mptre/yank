@@ -17,10 +17,10 @@ clean:
 	rm yank
 
 install: yank
-	@mkdir -p ${PREFIX}/bin
-	@mkdir -p ${MANPREFIX}/man1
-	install -m 0755 yank ${PREFIX}/bin
-	install -m 0644 yank.1 ${MANPREFIX}/man1
+	@mkdir -p ${DESTDIR}${PREFIX}/bin
+	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
+	install -m 0755 yank ${DESTDIR}${PREFIX}/bin
+	install -m 0644 yank.1 ${DESTDIR}${MANPREFIX}/man1
 
 .PHONY: all clean install
 
