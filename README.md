@@ -37,52 +37,52 @@ required to use a multiplexer but instead use a terminal agnostic solution.
 Examples
 --------
 
-  - Yank a environment variable key or value:
+- Yank a environment variable key or value:
 
-    ```
-    env | yank -d =
-    ```
+  ```sh
+  env | yank -d =
+  ```
 
-  - Yank a field from a CSV file:
+- Yank a field from a CSV file:
 
-    ```
-    yank -d \", <file.csv
-    ```
+  ```sh
+  yank -d \", <file.csv
+  ```
 
-  - Yank a whole line using the `-l` option:
+- Yank a whole line using the `-l` option:
 
-    ```
-    make 2>&1 | yank -l
-    ```
+  ```sh
+  make 2>&1 | yank -l
+  ```
 
-  - If `stdout` is not a terminal the selected field will be written to `stdout`
-    and exit without invoking the yank command.
-    Kill the selected PID:
+- If `stdout` is not a terminal the selected field will be written to `stdout`
+  and exit without invoking the yank command.
+  Kill the selected PID:
 
-    ```
-    ps ux | yank -g [0-9]+ | xargs kill
-    ```
+  ```sh
+  ps ux | yank -g [0-9]+ | xargs kill
+  ```
 
-  - Yank the selected field to the clipboard as opposed of the default primary
-    clipboard:
+- Yank the selected field to the clipboard as opposed of the default primary
+  clipboard:
 
-    ```
-    yank -- xsel -b
-    ```
+  ```sh
+  yank -- xsel -b
+  ```
 
 Compilation
 -----------
 
 Run the following command:
 
-```
+```sh
 make
 ```
 
 The default yank command can be defined using the `YANKCMD` variable.
-Example: OS X users would use `pbcopy` as the default yank command:
+Example: macOS users would use `pbcopy` as the default yank command:
 
-```
+```sh
 make YANKCMD=pbcopy
 ```
 
@@ -96,43 +96,37 @@ Installation
 
 On AUR:
 
-```
+```sh
 yaourt -S yank
 ```
-
-Maintainer: Javier Tiá <javier.tia () gmail ! com>
 
 ### Debian
 
 On testing and unstable:
 
-```
+```sh
 sudo apt-get install yank
 ```
 
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 
-Maintainer: Sébastien Delafond <sdelafond () gmail ! com>
+### macOS
 
-### OS X
-
-```
+```sh
 brew install yank
 ```
-
-Maintainer: Carl Dong <dongcarl () fastmail ! fm>
 
 ### From source
 
 The install directory defaults to `/usr/local`:
 
-```
+```sh
 make install
 ```
 
 Change the install directory using the `PREFIX` variable:
 
-```
+```sh
 make PREFIX=DIR install
 ```
 
