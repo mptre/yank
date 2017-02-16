@@ -110,6 +110,17 @@ sudo apt-get install yank
 
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 
+### Fedora
+
+Versions 24/25/26:
+
+```sh
+sudo dnf copr enable nmilosev/yank
+sudo dnf install yank
+```
+
+The binary is installed at `/usr/bin/yank-cli` due to a naming conflict. Man-pages are both `yank` and `yank-cli`.
+
 ### macOS
 
 ```sh
