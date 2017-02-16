@@ -119,7 +119,8 @@ sudo dnf copr enable nmilosev/yank
 sudo dnf install yank
 ```
 
-The binary is installed at `/usr/bin/yank-cli` due to a naming conflict. Man-pages are both `yank` and `yank-cli`.
+The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
+Man-pages are available as both `yank` and `yank-cli`.
 
 ### macOS
 
