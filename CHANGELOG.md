@@ -4,6 +4,9 @@ vX.Y.Z - YYYY-MM-DD
 - Add Fedora install instructions to README (#33, #34, 8d90aae) (Nemanja
   Milosevic)
 
+- Allow the name of the compiled binary to be changed using the `PROG` variable
+  (#35, #36, 1c43c46) (Nemanja Milosevic)
+
 v0.8.0 - 2017-01-17
 ===================
 
