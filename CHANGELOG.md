@@ -1,4 +1,4 @@
-vX.Y.Z - YYYY-MM-DD
+v0.8.1 - 2017-02-18
 ===================
 
 - Add Fedora install instructions to README (#33, #34, 8d90aae) (Nemanja
