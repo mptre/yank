@@ -1,3 +1,8 @@
+v0.8.2 - 2017-02-19
+===================
+
+- Ensure `make clean` always exits with success (47a0ee9) (Sébastien Delafond)
+
 v0.8.1 - 2017-02-18
 ===================
 
