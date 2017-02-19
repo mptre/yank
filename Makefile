@@ -19,7 +19,7 @@ ${PROG}: yank.c
 	${CC} ${CFLAGS} -o ${PROG} yank.c ${LDFLAGS} ${CPPFLAGS}
 
 clean:
-	rm ${PROG}
+	rm -f ${PROG}
 
 install: ${PROG}
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
