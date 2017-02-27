@@ -37,7 +37,7 @@ required to use a multiplexer but instead use a terminal agnostic solution.
 Examples
 --------
 
-- Yank a environment variable key or value:
+- Yank an environment variable key or value:
 
   ```sh
   env | yank -d =
