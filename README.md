@@ -128,6 +128,10 @@ Man-pages are available as both `yank` and `yank-cli`.
 brew install yank
 ```
 
+### OpenBSD
+
+Available in ports under `sysutils/yank`.
+
 ### From source
 
 The install directory defaults to `/usr/local`:
