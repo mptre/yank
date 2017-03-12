@@ -1,3 +1,10 @@
+vX.Y.Z - YYYY-MM-DD
+===================
+
+- Fix typo in README and man page (fe45fc1) (Jakub Wilk)
+
+- Add OpenBSD install instructions to README (c20e9bb) (Anton Lindqvist)
+
 v0.8.2 - 2017-02-19
 ===================
 
