@@ -112,10 +112,9 @@ The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 
 ### Fedora
 
-Versions 24/25/26:
+Versions 24/25/26/Rawhide:
 
 ```sh
-sudo dnf copr enable nmilosev/yank
 sudo dnf install yank
 ```
 
