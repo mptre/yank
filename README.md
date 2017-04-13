@@ -1,12 +1,10 @@
-yank
-====
+# yank
 
 Yank terminal output to clipboard.
 
 ![yank](https://raw.githubusercontent.com/mptre/yank/gh-pages/screencast.gif)
 
-Description
------------
+## Description
 
 Read input from `stdin` and display a selection interface that allows a field to
 be selected and copied to the clipboard.
@@ -14,28 +12,26 @@ Fields are either recognized by a regular expression using the `-g` option or by
 splitting the input on a delimiter sequence using the `-d` option.
 
 Using the arrow keys will move the selected field.
-The interface supports several Emacs and Vi like key bindings, consult the man
-page for further reference.
+The interface supports several Emacs and Vi like key bindings,
+consult the man page for further reference.
 Pressing the return key will invoke the yank command and write the selected
 field to its `stdin`.
-The yank command defaults to [xsel] but could be anything that accepts input on
-`stdin`.
-When invoking yank everything supplied after the `--` option will be used as the
-yank command, see examples below.
-The default yank command can also be defined at compile time, see compilation
-below.
+The yank command defaults to [xsel(1)] but could be anything that accepts input
+on `stdin`.
+When invoking yank,
+everything supplied after the `--` option will be used as the yank command,
+see examples below.
 
-Motivation
-----------
+## Motivation
 
 Others including myself consider it a cache miss when resort to using the mouse.
 Copying output from the terminal is still one of the few cases where I still use
 the mouse.
-Several terminal multiplexers solves this issue, however I don't want to be
-required to use a multiplexer but instead use a terminal agnostic solution.
+Several terminal multiplexers solves this issue,
+however I don't want to be required to use a multiplexer but instead use a
+terminal agnostic solution.
 
-Examples
---------
+## Examples
 
 - Yank an environment variable key or value:
 
@@ -70,27 +66,7 @@ Examples
   yank -- xsel -b
   ```
 
-Compilation
------------
-
-Run the following command:
-
-```sh
-make
-```
-
-The default yank command can be defined using the `YANKCMD` variable.
-Example: macOS users would use `pbcopy` as the default yank command:
-
-```sh
-make YANKCMD=pbcopy
-```
-
-Alternatively put the `YANKCMD` variable declaration in your local `config.mk`
-file.
-
-Installation
-------------
+## Installation
 
 ### Arch Linux
 
@@ -129,7 +105,9 @@ brew install yank
 
 ### OpenBSD
 
-Available in ports under `sysutils/yank`.
+```sh
+pkg_add yank
+```
 
 ### From source
 
@@ -145,4 +123,16 @@ Change the install directory using the `PREFIX` variable:
 make PREFIX=DIR install
 ```
 
-[xsel]: http://www.vergenet.net/~conrad/software/xsel/
+The default yank command can be defined using the `YANKCMD` variable.
+For instance,
+macOS users would prefer `pbcopy(1)`:
+
+```sh
+make YANKCMD=pbcopy
+```
+
+## License
+
+Copyright (c) Anton Lindqvist. Distributed under the MIT license.
+
+[xsel(1)]: http://www.vergenet.net/~conrad/software/xsel/
