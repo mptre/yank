@@ -6,6 +6,7 @@ PREFIX=		/usr/local
 MANPREFIX=	${PREFIX}/share/man
 
 PROG=	yank
+OBJS=	yank.o
 
 INSTALL_PROGRAM=	install -s -m 0755
 INSTALL_MAN=		install -m 0644
@@ -15,11 +16,11 @@ CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 all: ${PROG}
 
-${PROG}: yank.c
-	${CC} ${CFLAGS} -o ${PROG} yank.c ${LDFLAGS} ${CPPFLAGS}
+${PROG}: ${OBJS}
+	${CC} -o ${PROG} ${OBJS} ${LDFLAGS}
 
 clean:
-	rm -f ${PROG}
+	rm -f ${PROG} ${OBJS}
 
 install: ${PROG}
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
