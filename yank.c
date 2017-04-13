@@ -412,12 +412,12 @@ main(int argc, char *argv[])
 	char			*pat;
 	int			c, i, rflags = REG_EXTENDED;
 
+	setlocale(LC_CTYPE, "");
+
 #ifdef __OpenBSD__
-	if (pledge("stdio rpath proc exec tty", NULL) == -1)
+	if (pledge("stdio tty proc exec", NULL) == -1)
 		err(1, "pledge");
 #endif
-
-	setlocale(LC_CTYPE, "");
 
 	pat = strtopat(" ");
 	while ((c = getopt(argc, argv, "ilvxd:g:")) != -1)
