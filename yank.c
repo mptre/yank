@@ -100,11 +100,13 @@ strtopat(const char *s)
 	const char	*fmt = "[^%s\f\n\r\t]+";
 	char		*pat;
 	size_t		len;
+	int		n;
 
 	len = strlen(s) + strlen(fmt) + 1;
 	if ((pat = malloc(len)) == NULL)
 		err(1, NULL);
-	if (snprintf(pat, len, fmt, s) >= (ssize_t)len)
+	n = snprintf(pat, len, fmt, s);
+	if (n == -1 || n >= (ssize_t)len)
 		errx(1, "pattern too long");
 
 	return pat;
