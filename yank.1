@@ -20,10 +20,10 @@ Fields are either recognized by a regular expression using the
 option or by splitting the input on a delimiter sequence using the
 .Fl d
 option, see
-.Em DELIMITERS .
+.Sx DELIMITERS .
 .Pp
 Using the arrow keys will move the selected field, see
-.Em COMMANDS .
+.Sx COMMANDS .
 Pressing the return key will invoke
 .Ar command
 and write the selected field to its
@@ -35,7 +35,7 @@ defaults to
 but could be anything that accepts input on
 .Pa stdin ,
 see
-.Em EXAMPLES .
+.Sx EXAMPLES .
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -43,7 +43,7 @@ The options are as follows:
 All input characters not present in
 .Ar delim
 will be recognized as fields, see
-.Em DELIMITERS .
+.Sx DELIMITERS .
 .It Fl g Ar pattern
 Use
 .Ar pattern
@@ -54,7 +54,7 @@ Ignore case differences between
 and the input.
 .It Fl l
 Use the default delimiters except for space, see
-.Em DELIMITERS .
+.Sx DELIMITERS .
 .It Fl v
 Prints version.
 .It Fl x
@@ -106,14 +106,17 @@ If the
 option is present space is not recognized as a delimiter.
 .Sh EXAMPLES
 Yank an environment variable key or value:
+.Pp
 .Dl $ env | yank -d =
 .Pp
 Yank a field from a CSV file:
+.Pp
 .Dl $ yank -d \e\&", <file.csv
 .Pp
 Yank a whole line using the
 .Fl l
 option:
+.Pp
 .Dl $ make 2>&1 | yank -l
 .Pp
 If
@@ -122,10 +125,12 @@ is not a terminal the selected field will be written to
 .Pa stdout
 and exit without invoking the yank command.
 Kill the selected PID:
+.Pp
 .Dl $ ps ux | yank -g [0-9]+ | xargs kill
 .Pp
 Yank the selected field to the clipboard as opposed of the default primary
 clipboard:
+.Pp
 .Dl $ yank -- xsel -b
 .Sh DIAGNOSTICS
 .Ex -std
