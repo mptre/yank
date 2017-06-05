@@ -1,9 +1,18 @@
-vX.Y.Z - YYYY-MM-DD
+v0.8.3 - 2017-06-05
 ===================
 
 - Fix typo in README and man page (fe45fc1) (Jakub Wilk)
 
 - Add OpenBSD install instructions to README (c20e9bb) (Anton Lindqvist)
+
+- Call `setlocale(3)` prior pledge, allows the `rpath` promise to be removed
+  (20cdc5a) (Anton Lindqvist)
+
+- Compile and link separately (7691802) (Anton Lindqvist)
+
+- Cleanup README and man page (495b53e, 6dd722d) (Anton Lindqvist)
+
+- `snprintf(3)` can return `-1` (9ecb1f5) (Anton Lindqvist)
 
 v0.8.2 - 2017-02-19
 ===================
