@@ -97,6 +97,13 @@ sudo dnf install yank
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 Man-pages are available as both `yank` and `yank-cli`.
 
+
+### Nix/NixOS
+
+```sh
+nix-env -i yank
+```
+
 ### macOS
 
 ```sh
