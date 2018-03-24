@@ -146,4 +146,4 @@ make YANKCMD=pbcopy
 Copyright (c) Anton Lindqvist. Distributed under the MIT license.
 
 [xsel]: http://www.vergenet.net/~conrad/software/xsel/
-[yank]: https://mptre.github.io/yank.1
+[yank]: https://mptre.github.io/yank/
