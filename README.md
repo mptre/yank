@@ -6,8 +6,10 @@ Yank terminal output to clipboard.
 
 ## Description
 
-Read input from `stdin` and display a selection interface that allows a field to
-be selected and copied to the clipboard.
+The
+[yank(1)][yank]
+utility reads input from `stdin` and display a selection interface that allows a
+field to be selected and copied to the clipboard.
 Fields are either recognized by a regular expression using the `-g` option or by
 splitting the input on a delimiter sequence using the `-d` option.
 
@@ -16,8 +18,9 @@ The interface supports several Emacs and Vi like key bindings,
 consult the man page for further reference.
 Pressing the return key will invoke the yank command and write the selected
 field to its `stdin`.
-The yank command defaults to [xsel(1)] but could be anything that accepts input
-on `stdin`.
+The yank command defaults to
+[xsel(1)][xsel]
+but could be anything that accepts input on `stdin`.
 When invoking yank,
 everything supplied after the `--` option will be used as the yank command,
 see examples below.
@@ -142,4 +145,5 @@ make YANKCMD=pbcopy
 
 Copyright (c) Anton Lindqvist. Distributed under the MIT license.
 
-[xsel(1)]: http://www.vergenet.net/~conrad/software/xsel/
+[xsel]: http://www.vergenet.net/~conrad/software/xsel/
+[yank]: https://mptre.github.io/yank.1
