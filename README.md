@@ -100,6 +100,11 @@ sudo dnf install yank
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 Man-pages are available as both `yank` and `yank-cli`.
 
+### FreeBSD
+
+```sh
+pkg install yank
+```
 
 ### Nix/NixOS
 
