@@ -39,19 +39,19 @@ terminal agnostic solution.
 - Yank an environment variable key or value:
 
   ```sh
-  env | yank -d =
+  $ env | yank -d =
   ```
 
 - Yank a field from a CSV file:
 
   ```sh
-  yank -d \", <file.csv
+  $ yank -d \", <file.csv
   ```
 
 - Yank a whole line using the `-l` option:
 
   ```sh
-  make 2>&1 | yank -l
+  $ make 2>&1 | yank -l
   ```
 
 - If `stdout` is not a terminal the selected field will be written to `stdout`
@@ -59,14 +59,14 @@ terminal agnostic solution.
   Kill the selected PID:
 
   ```sh
-  ps ux | yank -g [0-9]+ | xargs kill
+  $ ps ux | yank -g [0-9]+ | xargs kill
   ```
 
 - Yank the selected field to the clipboard as opposed of the default primary
   clipboard:
 
   ```sh
-  yank -- xsel -b
+  $ yank -- xsel -b
   ```
 
 ## Installation
@@ -76,7 +76,7 @@ terminal agnostic solution.
 On AUR:
 
 ```sh
-yaourt -S yank
+$ yaourt -S yank
 ```
 
 ### Debian
@@ -84,7 +84,7 @@ yaourt -S yank
 On testing and unstable:
 
 ```sh
-sudo apt-get install yank
+$ sudo apt-get install yank
 ```
 
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
@@ -94,7 +94,7 @@ The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
 Versions 24/25/26/Rawhide:
 
 ```sh
-sudo dnf install yank
+$ sudo dnf install yank
 ```
 
 The binary is installed at `/usr/bin/yank-cli` due to a naming conflict.
@@ -103,25 +103,25 @@ Man-pages are available as both `yank` and `yank-cli`.
 ### Nix/NixOS
 
 ```sh
-nix-env -i yank
+$ nix-env -i yank
 ```
 
 ### macOS
 
 ```sh
-brew install yank
+$ brew install yank
 ```
 
 ### FreeBSD
 
 ```sh
-pkg install yank
+$ pkg install yank
 ```
 
 ### OpenBSD
 
 ```sh
-pkg_add yank
+$ pkg_add yank
 ```
 
 ### From source
@@ -129,13 +129,13 @@ pkg_add yank
 The install directory defaults to `/usr/local`:
 
 ```sh
-make install
+$ make install
 ```
 
 Change the install directory using the `PREFIX` variable:
 
 ```sh
-make PREFIX=DIR install
+$ make PREFIX=DIR install
 ```
 
 The default yank command can be defined using the `YANKCMD` variable.
@@ -143,7 +143,7 @@ For instance,
 macOS users would prefer `pbcopy(1)`:
 
 ```sh
-make YANKCMD=pbcopy
+$ make YANKCMD=pbcopy
 ```
 
 ## License
