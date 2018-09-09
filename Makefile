@@ -12,7 +12,7 @@ INSTALL_PROGRAM=	install -s -m 0755
 INSTALL_MAN=		install -m 0644
 
 CFLAGS+=	-pedantic -Wall -Werror -Wextra
-CPPFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
+CFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 DISTFILES=	CHANGELOG.md \
 		LICENSE \
