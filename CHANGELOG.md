@@ -1,3 +1,22 @@
+v1.0.0 - 2018-09-09
+===================
+
+- Fix a broken reference and improve the semantics of the manual.
+  (f99c6ed, 7a964c1)
+  (Anton Lindqvist)
+
+- Add Nix installation instructions to README.
+  (412a5cd, #40)
+  (Matt)
+
+- Add caveats section to manual.
+  (88e8ca8)
+  (Anton Lindqvist)
+
+- Start providing deterministic release tarballs,
+  instead of relying on the ones created by GitHub.
+  (99a91e2)
+
 v0.8.3 - 2017-06-05
 ===================
 

@@ -1,4 +1,4 @@
-VERSION=	0.8.3
+VERSION=	1.0.0
 
 YANKCMD=	xsel
 
