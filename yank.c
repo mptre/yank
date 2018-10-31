@@ -430,7 +430,8 @@ main(int argc, char *argv[])
 			break;
 		case 'g':
 			free(pat);
-			pat = optarg;
+			if ((pat = strdup(optarg)) == NULL)
+				err(1, NULL);
 			rflags |= REG_NEWLINE;
 			break;
 		case 'i':
