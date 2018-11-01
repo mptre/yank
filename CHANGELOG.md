@@ -1,3 +1,19 @@
+v1.1.0 - 2018-11-01
+===================
+
+- Fix compilation on FreeBSD by passing preprocessor macros in `CFLAGS` as
+  opposed of using `CPPFLAGS` which is not honored.
+  (78ededb)
+  (Tobias Kortkamp)
+
+- Add FreeBSD install instructions.
+  (0dd944b)
+  (Tobias Kortkamp)
+
+- Fix a bogus free by storing a copy of the pattern argument.
+  (8dff9f3)
+  (Tobias Kortkamp)
+
 v1.0.0 - 2018-09-09
 ===================
 
