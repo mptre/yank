@@ -152,4 +152,4 @@ Copyright (c) 2018 Anton Lindqvist.
 Distributed under the MIT license.
 
 [xsel]: http://www.vergenet.net/~conrad/software/xsel/
-[yank]: https://mptre.github.io/yank/
+[yank]: https://www.basename.se/yank/
