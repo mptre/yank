@@ -106,6 +106,12 @@ Man-pages are available as both `yank` and `yank-cli`.
 $ nix-env -i yank
 ```
 
+### openSUSE
+
+```
+$ zypper install yank
+```
+
 ### macOS
 
 ```sh
