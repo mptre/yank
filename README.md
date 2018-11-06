@@ -124,6 +124,12 @@ $ pkg install yank
 $ pkg_add yank
 ```
 
+### openSUSE
+
+```
+zypper install yank
+```
+
 ### From source
 
 The install directory defaults to `/usr/local`:
