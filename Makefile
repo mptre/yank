@@ -1,11 +1,11 @@
 VERSION=	1.1.0
 
-YANKCMD=	xsel
+YANKCMD?=	xsel
 
-PREFIX=		/usr/local
-MANPREFIX=	${PREFIX}/share/man
+PREFIX?=	/usr/local
+MANPREFIX?=	${PREFIX}/share/man
 
-PROG=	yank
+PROG?=	yank
 OBJS=	yank.o
 
 INSTALL_PROGRAM=	install -s -m 0755
