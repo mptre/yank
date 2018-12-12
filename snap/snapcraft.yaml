@@ -31,3 +31,5 @@ apps:
     command: usr/local/bin/yank
     plugs:
       - x11
+      - home
+      - removable-media
