@@ -64,6 +64,7 @@ static struct {
 	int		rfd;
 	int		wfd;
 	int		ca;	/* use alternate screen */
+	int		clear;
 	struct termios	attr;
 } tty;
 
@@ -280,8 +281,10 @@ tsetup(void)
 static void
 tend(void)
 {
-	tputs(T_RESTORE_CURSOR);
-	tputs(T_CLR_EOS);
+	if (tty.clear) {
+		tputs(T_RESTORE_CURSOR);
+		tputs(T_CLR_EOS);
+	}
 	tputs(T_CURSOR_VISIBLE);
 	if (tty.ca)
 		tputs(T_EXIT_CA_MODE);
@@ -422,7 +425,8 @@ main(int argc, char *argv[])
 #endif
 
 	pat = strtopat(" ");
-	while ((c = getopt(argc, argv, "ilvxd:g:")) != -1)
+	tty.clear = 1; /* by default screen is cleared */
+	while ((c = getopt(argc, argv, "ilvxXd:g:")) != -1)
 		switch (c) {
 		case 'd':
 			free(pat);
@@ -446,6 +450,9 @@ main(int argc, char *argv[])
 			exit(0);
 		case 'x':
 			tty.ca = 1;
+			break;
+		case 'X':
+			tty.clear = 0;
 			break;
 		default:
 			usage();
