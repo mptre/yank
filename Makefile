@@ -11,7 +11,7 @@ OBJS=	yank.o
 INSTALL_PROGRAM=	install -s -m 0755
 INSTALL_MAN=		install -m 0644
 
-CFLAGS+=	-pedantic -Wall -Werror -Wextra
+CFLAGS+=	-pedantic -Wall -Wextra
 CFLAGS+=	-DVERSION=\"${VERSION}\" -DYANKCMD=\"${YANKCMD}\"
 
 DISTFILES=	CHANGELOG.md \
