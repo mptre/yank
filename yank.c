@@ -403,7 +403,7 @@ tmain(void)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: yank [-lx | -v] [-d delim] [-g pattern [-i]] "
+	fprintf(stderr, "usage: yank [-ilxv] [-d delim] [-g pattern] "
 	    "[-- command [args]]\n");
 	exit(2);
 }
