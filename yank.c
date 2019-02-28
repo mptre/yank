@@ -316,18 +316,19 @@ tgetc(void)
 		{ "\033[D",	KEY_LEFT },
 		{ NULL,		0 },
 	};
-	char	buf[3];
+	char	buf[4];
 	ssize_t	n;
 	int	i;
 
-	n = read(tty.rfd, buf, sizeof(buf));
+	n = read(tty.rfd, buf, sizeof(buf) - 1);
 	if (n == -1)
 		err(1, "read");
 	if (n == 0)
 		return KEY_TERM;	/* EOF */
+	buf[n] = '\0';
 
 	for (i = 0; keys[i].s != NULL; i++)
-		if (strncmp(keys[i].s, buf, n) == 0)
+		if (strncmp(keys[i].s, buf, strlen(keys[i].s)) == 0)
 			return keys[i].c;
 
 	return 0;
