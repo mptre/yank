@@ -1,5 +1,4 @@
-v1.2.0 - 2019-08-12
-===================
+# v1.2.0 - 2019-08-12
 
 - Add openSUSE installation instructions to README.
   (c4ce72e)
@@ -17,8 +16,7 @@ v1.2.0 - 2019-08-12
   (dffe105)
   (Anton Lindqvist)
 
-v1.1.0 - 2018-11-01
-===================
+# v1.1.0 - 2018-11-01
 
 - Fix compilation on FreeBSD by passing preprocessor macros in `CFLAGS` as
   opposed of using `CPPFLAGS` which is not honored.
@@ -33,8 +31,7 @@ v1.1.0 - 2018-11-01
   (8dff9f3)
   (Tobias Kortkamp)
 
-v1.0.0 - 2018-09-09
-===================
+# v1.0.0 - 2018-09-09
 
 - Fix a broken reference and improve the semantics of the manual.
   (f99c6ed, 7a964c1)
@@ -52,8 +49,7 @@ v1.0.0 - 2018-09-09
   instead of relying on the ones created by GitHub.
   (99a91e2)
 
-v0.8.3 - 2017-06-05
-===================
+# v0.8.3 - 2017-06-05
 
 - Fix typo in README and man page (fe45fc1) (Jakub Wilk)
 
@@ -68,13 +64,11 @@ v0.8.3 - 2017-06-05
 
 - `snprintf(3)` can return `-1` (9ecb1f5) (Anton Lindqvist)
 
-v0.8.2 - 2017-02-19
-===================
+# v0.8.2 - 2017-02-19
 
 - Ensure `make clean` always exits with success (47a0ee9) (Sébastien Delafond)
 
-v0.8.1 - 2017-02-18
-===================
+# v0.8.1 - 2017-02-18
 
 - Add Fedora install instructions to README (#33, #34, 8d90aae) (Nemanja
   Milosevic)
@@ -82,8 +76,7 @@ v0.8.1 - 2017-02-18
 - Allow the name of the compiled binary to be changed using the `PROG` variable
   (#35, #36, 1c43c46) (Nemanja Milosevic)
 
-v0.8.0 - 2017-01-17
-===================
+# v0.8.0 - 2017-01-17
 
 - Update man page and README (9eac46f, 252a419) (Anton Lindqvist)
 
@@ -93,8 +86,7 @@ v0.8.0 - 2017-01-17
 
 - Add support for `DESTDIR` to Makefile (77cf987) (Anton Lindqvist)
 
-v0.7.1 - 2016-10-08
-===================
+# v0.7.1 - 2016-10-08
 
 - Update man page (2e78c28, a5cdba9) (Anton Lindqvist)
 
@@ -110,22 +102,19 @@ v0.7.1 - 2016-10-08
 
 - Refactoring and cleanup (2017de6) (Anton Lindqvist)
 
-v0.7.0 - 2016-05-18
-===================
+# v0.7.0 - 2016-05-18
 
 - Add MANPREFIX support to installation task (Anton Lindqvist)
 
 - Pledge on OpenBSD (Anton Lindqvist)
 
-v0.6.4 - 2016-03-13
-===================
+# v0.6.4 - 2016-03-13
 
 - Add Vi key bindings (Samson Yeung)
 
 - Fix wrong exit code on yank command failure (Anton Lindqvist)
 
-v0.6.3 - 2016-02-20
-===================
+# v0.6.3 - 2016-02-20
 
 - Exit with correct code on invocation failure (Anton Lindqvist)
 
@@ -133,24 +122,20 @@ v0.6.3 - 2016-02-20
 
 - Fix endless loop while executing the supplied regex (Anton Lindqvist)
 
-v0.6.2 - 2015-12-15
-===================
+# v0.6.2 - 2015-12-15
 
 - Fix non string literal compilation warning (Anton Lindqvist)
 
-v0.6.1 - 2015-12-15
-===================
+# v0.6.1 - 2015-12-15
 
 - Use more common save/restore cursor capabilities (Eli Young)
 
-v0.6.0 - 2015-12-06
-===================
+# v0.6.0 - 2015-12-06
 
 - Add regex delimiter support using the `-g` option and `-i` to make the pattern
   case-insensitive (Anton Lindqvist)
 
-v0.5.0 - 2015-11-12
-===================
+# v0.5.0 - 2015-11-12
 
 - Add arrow key bindings (Anton Lindqvist)
 
@@ -158,8 +143,7 @@ v0.5.0 - 2015-11-12
 
 - Add OS X installation instructions (Carl Dong)
 
-v0.4.1 - 2015-10-19
-===================
+# v0.4.1 - 2015-10-19
 
 - Fix number of lines in input bug (Anton Lindqvist)
 
@@ -167,8 +151,7 @@ v0.4.1 - 2015-10-19
 
 - Fix description in man page (Jeremiah LaRocco)
 
-v0.4.0 - 2015-10-10
-===================
+# v0.4.0 - 2015-10-10
 
 - Always recognize carriage return as a delimiter (Anton Lindqvist)
 
@@ -178,20 +161,17 @@ v0.4.0 - 2015-10-10
 
 - Fix number of lines in input bug (Anton Lindqvist)
 
-v0.3.1 - 2015-09-24
-===================
+# v0.3.1 - 2015-09-24
 
 - Fix moving beyond input bug (Anton Lindqvist)
 
-v0.3.0 - 2015-09-21
-===================
+# v0.3.0 - 2015-09-21
 
 - Add `-x` option used to enable usage of the alternate screen (Anton Lindqvist)
 
 - Fix `style(9)` violations (Anton Lindqvist)
 
-v0.2.0 - 2015-09-10
-===================
+# v0.2.0 - 2015-09-10
 
 - Add `-l` option used to yank a whole line (Anton Lindqvist)
 
@@ -203,12 +183,10 @@ v0.2.0 - 2015-09-10
 
 - Fix number of lines in input bug (Anton Lindqvist)
 
-v0.1.1 - 2015-08-28
-===================
+# v0.1.1 - 2015-08-28
 
 - Add support for linking against musl (Anton Lindqvist)
 
-v0.1.0 - 2015-08-24
-===================
+# v0.1.0 - 2015-08-24
 
 - Initial commit (Anton Lindqvist)
