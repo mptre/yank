@@ -262,6 +262,7 @@ tsetup(void)
 	if (tcgetattr(tty.rfd, &tty.attr) == -1)
 		err(1, "tcgetattr");
 	attr = tty.attr;
+	attr.c_iflag |= ICRNL;
 	attr.c_lflag &= ~(ICANON|ECHO|ISIG);
 	if (tcsetattr(tty.rfd, TCSANOW, &attr) == -1)
 		err(1, "tcsetattr");
