@@ -1,3 +1,22 @@
+v1.2.0 - 2019-08-12
+===================
+
+- Add openSUSE installation instructions to README.
+  (c4ce72e)
+  (Dany Marcoux)
+
+- Do not confuse the escape key with up arrow.
+  (8536116)
+  (Emanuele Giaquinta)
+
+- Remove opinionated `-Werror` option from `CFLAGS`.
+  (f9ac9e6)
+  (Anton Lindqvist)
+
+- Map carriage return to newline.
+  (dffe105)
+  (Anton Lindqvist)
+
 v1.1.0 - 2018-11-01
 ===================
 
