@@ -81,8 +81,6 @@ $ yaourt -S yank
 
 ### Debian
 
-On testing and unstable:
-
 ```sh
 $ sudo apt-get install yank
 ```
