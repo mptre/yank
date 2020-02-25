@@ -152,7 +152,7 @@ $ make YANKCMD=pbcopy
 
 ## License
 
-Copyright (c) 2019 Anton Lindqvist.
+Copyright (c) 2020 Anton Lindqvist.
 Distributed under the MIT license.
 
 [xsel]: http://www.vergenet.net/~conrad/software/xsel/
