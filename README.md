@@ -110,10 +110,16 @@ $ nix-env -i yank
 $ zypper install yank
 ```
 
-### macOS
+### macOS ([Homebrew](https://brew.sh))
 
 ```sh
 $ brew install yank
+```
+
+### macOS ([MacPorts](https://www.macports.org))
+
+```sh
+$ sudo port install yank
 ```
 
 ### FreeBSD
