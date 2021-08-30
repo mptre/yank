@@ -47,6 +47,6 @@ install: ${PROG}
 	${INSTALL_PROGRAM} ${PROG} ${DESTDIR}${PREFIX}/bin
 	${INSTALL_MAN} yank.1 ${DESTDIR}${MANPREFIX}/man1
 
-.PHONY: all clean dist distclean install
+.PHONY: all clean dist install
 
 -include config.mk
