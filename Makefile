@@ -41,9 +41,6 @@ dist:
 	sha256 $$d.tar.gz >$$d.sha256; \
 	rm -r $$d
 
-distclean: clean
-	rm -f ${PROG}-${VERSION}.tar.gz ${PROG}-${VERSION}.sha256
-
 install: ${PROG}
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
