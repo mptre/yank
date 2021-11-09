@@ -28,6 +28,7 @@ ${PROG}: ${OBJS}
 
 clean:
 	rm -f ${PROG} ${OBJS}
+.PHONY: clean
 
 dist:
 	set -e; \
@@ -40,13 +41,13 @@ dist:
 	tar czvf $$d.tar.gz $$d; \
 	sha256 $$d.tar.gz >$$d.sha256; \
 	rm -r $$d
+.PHONY: dist
 
 install: ${PROG}
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	${INSTALL_PROGRAM} ${PROG} ${DESTDIR}${PREFIX}/bin
 	${INSTALL_MAN} yank.1 ${DESTDIR}${MANPREFIX}/man1
-
-.PHONY: all clean dist install
+.PHONY: install
 
 -include config.mk
