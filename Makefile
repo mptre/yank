@@ -8,6 +8,8 @@ MANPREFIX=	${PREFIX}/share/man
 PROG=	yank
 OBJS=	yank.o
 
+KNFMT+=	yank.c
+
 INSTALL_PROGRAM=	install -s -m 0755
 INSTALL_MAN=		install -m 0644
 
@@ -43,11 +45,20 @@ dist:
 	rm -r $$d
 .PHONY: dist
 
+format:
+	cd ${.CURDIR} && knfmt -i ${KNFMT}
+.PHONY: format
+
 install: ${PROG}
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	${INSTALL_PROGRAM} ${PROG} ${DESTDIR}${PREFIX}/bin
 	${INSTALL_MAN} yank.1 ${DESTDIR}${MANPREFIX}/man1
 .PHONY: install
+
+lint:
+	cd ${.CURDIR} && mandoc -Tlint -Wstyle yank.1
+	cd ${.CURDIR} && knfmt -d ${KNFMT}
+.PHONY: lint
 
 -include config.mk
