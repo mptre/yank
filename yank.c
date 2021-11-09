@@ -376,24 +376,25 @@ tmain(void)
 			j = i - 1;
 			break;
 		case KEY_DOWN:
-			j = i;
-			while (j < (ssize_t)f.nmemb && f.v[i].lo == f.v[j].lo)
-				j++;
-			if (j == (ssize_t)f.nmemb)
-				break;
-			/* FALLTHROUGH */
-		if (0) {
 		case KEY_UP:
-			k = i;
-			while (k && f.v[i].lo == f.v[k].lo)
-				k--;
-			j = k;
-			while (j && f.v[j - 1].lo == f.v[k].lo)
-				j--;
-		}
-			for (; fcmp(&f.v[i], &f.v[j]) < 0
-			     && f.v[j].lo == f.v[j + 1].lo; j++)
-				/* NOP */;
+			if (c == KEY_DOWN) {
+				j = i;
+				while (j < (ssize_t)f.nmemb &&
+				    f.v[i].lo == f.v[j].lo)
+					j++;
+				if (j == (ssize_t)f.nmemb)
+					break;
+			} else {
+				k = i;
+				while (k && f.v[i].lo == f.v[k].lo)
+					k--;
+				j = k;
+				while (j && f.v[j - 1].lo == f.v[k].lo)
+					j--;
+			}
+			for (; fcmp(&f.v[i], &f.v[j]) < 0 &&
+			    f.v[j].lo == f.v[j + 1].lo; j++)
+				continue;
 			break;
 		}
 		if (j >= 0 && j < (ssize_t)f.nmemb)
