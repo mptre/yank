@@ -49,14 +49,14 @@ static regex_t reg;
 static char **yankargv;
 
 static struct {
-	size_t	nmemb;
-	size_t	size;
-	struct	field *v;
+	size_t		 nmemb;
+	size_t		 size;
+	struct field	*v;
 } f;
 
 static struct {
-	size_t	size;
-	size_t	nmemb;
+	size_t	 size;
+	size_t	 nmemb;
 	char	*v;
 } in;
 
@@ -70,7 +70,7 @@ static struct {
 static void
 input(void)
 {
-	int	n;
+	int n;
 
 	in.size = BUFSIZ;
 	if ((in.v = malloc(in.size)) == NULL)
@@ -97,10 +97,10 @@ input(void)
 static char *
 strtopat(const char *s)
 {
-	const char	*fmt = "[^%s\f\n\r\t]+";
-	char		*pat;
-	size_t		len;
-	int		n;
+	const char *fmt = "[^%s\f\n\r\t]+";
+	char *pat;
+	size_t len;
+	int n;
 
 	len = strlen(s) + strlen(fmt) + 1;
 	if ((pat = malloc(len)) == NULL)
@@ -120,7 +120,7 @@ strtopat(const char *s)
 static int
 fcmp(const struct field *f1, const struct field *f2)
 {
-	size_t	s1, s2, e1, e2;
+	size_t s1, s2, e1, e2;
 
 	s1 = f1->so - f1->lo, e1 = f1->eo - f1->lo;
 	s2 = f2->so - f2->lo, e2 = f2->eo - f2->lo;
@@ -131,8 +131,8 @@ fcmp(const struct field *f1, const struct field *f2)
 static ssize_t
 xwrite(int fd, const char *s, size_t nmemb)
 {
-	ssize_t	r;
-	size_t	n;
+	ssize_t r;
+	size_t n;
 
 	n = nmemb;
 	do {
@@ -149,9 +149,9 @@ xwrite(int fd, const char *s, size_t nmemb)
 static void
 yank(const char *s, size_t nmemb)
 {
-	int	fd[2];
-	int	status;
-	pid_t	pid;
+	int fd[2];
+	int status;
+	pid_t pid;
 
 	if (!isatty(1)) {
 		if (xwrite(1, s, nmemb) == -1)
@@ -198,7 +198,7 @@ twrite(const char *s, size_t nmemb)
 static void
 tputs(const char *s)
 {
-	size_t	n;
+	size_t n;
 
 	n = strlen(s);
 	twrite(s, n);
@@ -207,12 +207,12 @@ tputs(const char *s)
 static void
 tsetup(void)
 {
-	struct termios	attr;
-	struct winsize	ws;
-	regmatch_t	r;
-	char		*s, *e;
-	size_t		m, n, w;
-	unsigned int	i, j;
+	struct termios attr;
+	struct winsize ws;
+	regmatch_t r;
+	char *s, *e;
+	size_t m, n, w;
+	unsigned int i, j;
 
 	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
 		err(1, "/dev/tty");
@@ -253,8 +253,8 @@ tsetup(void)
 	}
 	f.nmemb = MIN(f.nmemb, j);
 	/* Ensure last field does not exceed the terminal width. */
-	if (n > 0 && f.nmemb > 0
-	    && f.v[f.nmemb - 1].eo - f.v[f.nmemb - 1].lo >= ws.ws_col)
+	if (n > 0 && f.nmemb > 0 &&
+	    f.v[f.nmemb - 1].eo - f.v[f.nmemb - 1].lo >= ws.ws_col)
 		f.v[f.nmemb - 1].eo = f.v[f.nmemb - 1].lo + ws.ws_col - 1;
 	/* Number of bytes to output. */
 	f.v[f.nmemb].lo = MAX(s - in.v - 1, 0);
@@ -296,8 +296,8 @@ tgetc(void)
 {
 	static struct {
 		const char	*s;
-		int		c;
-	}	keys[] = {
+		int		 c;
+	} keys[] = {
 		{ "\n",		KEY_ENTER },
 		{ "\001",	KEY_HOME },	/* Ctrl-A */
 		{ "\003",	KEY_TERM },	/* Ctrl-C */
@@ -317,9 +317,9 @@ tgetc(void)
 		{ "\033[D",	KEY_LEFT },
 		{ NULL,		0 },
 	};
-	char	buf[4];
-	ssize_t	n;
-	int	i;
+	char buf[4];
+	ssize_t n;
+	int i;
 
 	n = read(tty.rfd, buf, sizeof(buf) - 1);
 	if (n == -1)
@@ -338,8 +338,8 @@ tgetc(void)
 static const struct field *
 tmain(void)
 {
-	size_t	n;
-	int	c, i, j, k;
+	size_t n;
+	int c, i, j, k;
 
 	i = j = 0;
 	n = f.v[f.nmemb].lo;
@@ -413,9 +413,9 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	const struct field	*field;
-	char			*pat;
-	int			c, i, rflags = REG_EXTENDED;
+	const struct field *field;
+	char *pat;
+	int c, i, rflags = REG_EXTENDED;
 
 	setlocale(LC_CTYPE, "");
 
