@@ -46,7 +46,7 @@ dist:
 .PHONY: dist
 
 format:
-	cd ${.CURDIR} && knfmt -i ${KNFMT}
+	cd ${.CURDIR} && knfmt -is ${KNFMT}
 .PHONY: format
 
 install: ${PROG}
@@ -58,7 +58,7 @@ install: ${PROG}
 
 lint:
 	cd ${.CURDIR} && mandoc -Tlint -Wstyle yank.1
-	cd ${.CURDIR} && knfmt -d ${KNFMT}
+	cd ${.CURDIR} && knfmt -ds ${KNFMT}
 .PHONY: lint
 
 -include config.mk
