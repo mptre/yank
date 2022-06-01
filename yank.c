@@ -120,7 +120,7 @@ strtopat(const char *s)
 static int
 fcmp(const struct field *f1, const struct field *f2)
 {
-	size_t s1, s2, e1, e2;
+	size_t e1, e2, s1, s2;
 
 	s1 = f1->so - f1->lo, e1 = f1->eo - f1->lo;
 	s2 = f2->so - f2->lo, e2 = f2->eo - f2->lo;
@@ -210,7 +210,7 @@ tsetup(void)
 	struct termios attr;
 	struct winsize ws;
 	regmatch_t r;
-	char *s, *e;
+	char *e, *s;
 	size_t m, n, w;
 	unsigned int i, j;
 
@@ -415,7 +415,8 @@ main(int argc, char *argv[])
 {
 	const struct field *field;
 	char *pat;
-	int c, i, rflags = REG_EXTENDED;
+	int rflags = REG_EXTENDED;
+	int c, i;
 
 	setlocale(LC_CTYPE, "");
 
