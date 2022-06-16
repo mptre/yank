@@ -405,7 +405,7 @@ tmain(void)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: yank [-ilxv] [-d delim] [-g pattern] "
+	fprintf(stderr, "usage: yank [-1ilxv] [-d delim] [-g pattern] "
 	    "[-- command [args]]\n");
 	exit(2);
 }
@@ -415,6 +415,7 @@ main(int argc, char *argv[])
 {
 	const struct field *field;
 	char *pat;
+	int one = 0;
 	int rflags = REG_EXTENDED;
 	int c, i;
 
@@ -426,8 +427,11 @@ main(int argc, char *argv[])
 #endif
 
 	pat = strtopat(" ");
-	while ((c = getopt(argc, argv, "ilvxd:g:")) != -1)
+	while ((c = getopt(argc, argv, "1ilvxd:g:")) != -1)
 		switch (c) {
+		case '1':
+			one = 1;
+			break;
 		case 'd':
 			free(pat);
 			pat = strtopat(optarg);
@@ -469,7 +473,10 @@ main(int argc, char *argv[])
 
 	input();
 	tsetup();
-	field = tmain();
+	if (one && f.nmemb == 1)
+		field = &f.v[0];
+	else
+		field = tmain();
 	tend();
 	if (field == NULL)
 		return 1;

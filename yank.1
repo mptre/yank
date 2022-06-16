@@ -6,7 +6,7 @@
 .Nd yank terminal output to clipboard
 .Sh SYNOPSIS
 .Nm
-.Op Fl ilxv
+.Op Fl 1ilxv
 .Op Fl d Ar delim
 .Op Fl g Ar pattern
 .Op Fl - Ar command Op Ar argument ...
@@ -39,6 +39,10 @@ see
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl 1
+If only one field is recognized, select it and invoke
+.Ar command
+without displaying the selection interface.
 .It Fl d Ar delim
 All input characters not present in
 .Ar delim
