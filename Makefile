@@ -34,14 +34,15 @@ clean:
 
 dist:
 	set -e; \
-	d=${PROG}-${VERSION}; \
+	d=yank-${VERSION}; \
 	mkdir $$d; \
 	for f in ${DISTFILES}; do \
 		mkdir -p $$d/`dirname $$f`; \
-		cp $$f $$d/$$f; \
+		cp -p ${.CURDIR}/$$f $$d/$$f; \
 	done; \
-	tar czvf $$d.tar.gz $$d; \
-	sha256 $$d.tar.gz >$$d.sha256; \
+	find $$d -type d -exec touch -r ${.CURDIR}/Makefile {} \;; \
+	tar czvf ${.CURDIR}/$$d.tar.gz $$d; \
+	(cd ${.CURDIR}; sha256 $$d.tar.gz >$$d.sha256); \
 	rm -r $$d
 .PHONY: dist
 
