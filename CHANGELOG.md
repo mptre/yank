@@ -1,3 +1,11 @@
+# v1.3.0 - 2022-06-18
+
+## News
+
+- Add opt-in selection of one and only field.
+  (d8b2024)
+  (Anton Lindqvist)
+
 # v1.2.0 - 2019-08-12
 
 - Add openSUSE installation instructions to README.
