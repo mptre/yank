@@ -73,10 +73,8 @@ terminal agnostic solution.
 
 ### Arch Linux
 
-On AUR:
-
 ```sh
-$ yaourt -S yank
+$ pacman -S yank
 ```
 
 ### Debian
