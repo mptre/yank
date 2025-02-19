@@ -402,11 +402,50 @@ tmain(void)
 	}
 }
 
+const char *help_string = "USAGE: yank [OPTIONS]\n"
+    "\n"
+    "OPTIONS:\n"
+    "   -1      If only one field recognized, select it without selection interface.\n"
+    "   -d      Delimiter\n"
+    "   -g      POSIX extended regular expression pattern to recognize fields.\n"
+    "   -h      Print this help.\n"
+    "   -i      Ignore case differences between pattern and the input.\n"
+    "   -l      Use the default delimiters except for space (see below).\n"
+    "   -v      Prints version.\n"
+    "   -x      Use alternate screen.\n"
+    "\n"
+    "   -- command [argument ...]\n"
+    "           Use command with zero or more args as the yank command.\n"
+    "\n"
+    "COMMANDS:\n"
+    "   Ctrl-A | g          Move selection to the first field.\n"
+    "   Ctrl-C | Ctrl-D     Exit without invoking the yank command.\n"
+    "   Ctrl-E | G          Move selection to the last field.\n"
+    "   Ctrl-P/Ctrl-N | Left/Right | h/l\n"
+    "                       Move selection to the left or right.\n"
+    "   Up/Down | j/k       Move selection to the next or previous line.\n"
+    "   Enter               Exit using the selected field.\n"
+    "\n"
+    "DELIMITERS:\n"
+    "   \\f     form feed\n"
+    "   \\n     new line\n"
+    "   \\r     carriage return\n"
+    "   \\s     space\n"
+    "   \\t     horizontal tab\n";
+
+static void
+help(void)
+{
+	fprintf(stdout, help_string);
+	exit(0);
+}
+
 static void
 usage(void)
 {
 	fprintf(stderr, "usage: yank [-1ilxv] [-d delim] [-g pattern] "
-	    "[-- command [args]]\n");
+	    "[-- command [args]]\n"
+        "Try 'yank -h' for more information.\n");
 	exit(2);
 }
 
@@ -427,7 +466,7 @@ main(int argc, char *argv[])
 #endif
 
 	pat = strtopat(" ");
-	while ((c = getopt(argc, argv, "1ilvxd:g:")) != -1)
+	while ((c = getopt(argc, argv, "1ilvxd:g:h")) != -1)
 		switch (c) {
 		case '1':
 			one = 1;
@@ -455,6 +494,9 @@ main(int argc, char *argv[])
 		case 'x':
 			tty.ca = 1;
 			break;
+        case 'h':
+            help();
+            break;
 		default:
 			usage();
 		}
