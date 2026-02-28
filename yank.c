@@ -188,6 +188,57 @@ yank(const char *s, size_t nmemb)
 	}
 }
 
+/*
+ * This is a simple implementation of the base64 encoding algorithm.
+ * It emits the base64 encoding of the given string to stdout.
+ * @param s The string to emit.
+ * @param len The length of the string.
+ */
+static void
+base64_emit(const char *s, size_t len)
+{
+	static const char t[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	size_t i;
+	unsigned char b1, b2, b3;
+
+	for (i = 0; i < len; i += 3) {
+		b1 = s[i];
+		b2 = (i + 1 < len) ? s[i + 1] : 0;
+		b3 = (i + 2 < len) ? s[i + 2] : 0;
+
+		xwrite(1, &t[b1 >> 2], 1);
+		xwrite(1, &t[((b1 & 0x03) << 4) | (b2 >> 4)], 1);
+		if (i + 1 < len) xwrite(1, &t[((b2 & 0x0f) << 2) | (b3 >> 6)], 1);
+		else xwrite(1, "=", 1);
+		if (i + 2 < len) xwrite(1, &t[b3 & 0x3f], 1);
+		else xwrite(1, "=", 1);
+	}
+}
+
+/*
+ * Builtin OSC 52 implementation
+ * This implementation prints the selected field to stdout and 
+ * then sends the OSC 52 sequence to the terminal to copy the 
+ * selected field to the clipboard. This is particularly useful for
+ * headless environments (Docker/SSH) where the external clipboard utility
+ * may not be available.
+ * 
+ * @param s The selected field.
+ * @param nmemb The length of the selected field.
+ */
+static void
+builtin_osc52(const char *s, size_t nmemb)
+{
+    xwrite(1, s, nmemb);
+    xwrite(1, "\n", 1);
+
+    xwrite(1, "\x1b]52;c;", 7);
+    base64_emit(s, nmemb);
+    xwrite(1, "\x07", 1);
+    
+    exit(0);
+}
+
 static void
 twrite(const char *s, size_t nmemb)
 {
@@ -480,7 +531,13 @@ main(int argc, char *argv[])
 	tend();
 	if (field == NULL)
 		return 1;
-	yank(in.v + field->so, field->eo - field->so + 1);
+	
+	/* If the YANKCMD is "osc52", use the builtin OSC 52 implementation. */
+    if (strcmp(yankargv[0], "osc52") == 0) {
+        builtin_osc52(in.v + field->so, field->eo - field->so + 1);
+    } else { /* Otherwise, use the default yank implementation. */
+        yank(in.v + field->so, field->eo - field->so + 1);
+    }
 
 	return 0;
 }
