@@ -25,6 +25,15 @@ When invoking yank,
 everything supplied after the `--` option will be used as the yank command,
 see examples below.
 
+yank now supports a built-in `osc52` mode. This is 
+particularly useful in headless environments (like Docker containers or remote 
+SSH sessions) where traditional clipboard utilities (e.g., `xsel`, `xclip`) 
+cannot access a display. When this mode is active, the selected field is 
+written to `stdout` and synchronized to the local machine's clipboard via 
+the [OSC 52](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands) 
+terminal sequence. See [Installation - From source](#from-source) for installation instructions
+
+
 ## Motivation
 
 Others including myself consider it a cache miss when resort to using the mouse.
@@ -152,6 +161,12 @@ macOS users would prefer `pbcopy(1)`:
 
 ```sh
 $ make YANKCMD=pbcopy
+```
+
+For headless or remote environments, use the built-in `osc52` command:
+
+```sh
+$ make YANKCMD=osc52 install
 ```
 
 ## License
