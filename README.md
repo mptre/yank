@@ -154,6 +154,11 @@ macOS users would prefer `pbcopy(1)`:
 $ make YANKCMD=pbcopy
 ```
 
+When working over SSH or in headless environments (such as Docker containers) where traditional clipboard utilities like `xsel` or `xclip` fail to access a display, you can use an external **OSC 52** utility. This allows the selected field to be synchronized with your local machine's clipboard. For example, if you have [shcopy](https://github.com/aymanbagabas/shcopy) installed:
+```sh
+make YANKCMD=shcopy
+```
+
 ## License
 
 Copyright (c) 2015-2022 Anton Lindqvist.
