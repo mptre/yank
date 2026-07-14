@@ -35,6 +35,7 @@ enum {
 	KEY_RIGHT,
 	KEY_DOWN,
 	KEY_LEFT,
+	KEY_TOGGLE_DELIM,
 };
 
 struct field {
@@ -65,6 +66,14 @@ static struct {
 	int		ca;	/* use alternate screen */
 	struct termios	attr;
 } tty;
+
+static struct winsize ws;
+
+static struct {
+	char	*pat;	/* non-line pattern string */
+	int	 rflags;
+	int	 line;	/* currently in line mode */
+} delim;
 
 static void
 input(void)
@@ -204,25 +213,16 @@ tputs(const char *s)
 	twrite(s, n);
 }
 
-static void
-tsetup(void)
+static unsigned int
+fcompute(void)
 {
-	struct termios attr;
-	struct winsize ws;
 	regmatch_t r;
 	char *e, *s;
 	size_t m, n;
 	unsigned int i, j;
 
-	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
-		err(1, "/dev/tty");
-	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
-		err(1, "/dev/tty");
-
-	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) == -1)
-		err(1, "TIOCGWINSZ");
-
 	f.size = 32;
+	f.nmemb = 0;
 	if ((f.v = malloc(f.size*sizeof(struct field))) == NULL)
 		err(1, NULL);
 	m = n = MIN(ws.ws_col*ws.ws_row, (ssize_t)in.nmemb);
@@ -260,6 +260,25 @@ tsetup(void)
 		f.v[f.nmemb - 1].eo = f.v[f.nmemb - 1].lo + ws.ws_col - 1;
 	/* Number of bytes to output. */
 	f.v[f.nmemb].lo = MAX(s - in.v - 1, 0);
+
+	return i;
+}
+
+static void
+tsetup(void)
+{
+	struct termios attr;
+	unsigned int i, j;
+
+	if ((tty.rfd = open("/dev/tty", O_RDONLY)) == -1)
+		err(1, "/dev/tty");
+	if ((tty.wfd = open("/dev/tty", O_WRONLY)) == -1)
+		err(1, "/dev/tty");
+
+	if (ioctl(tty.rfd, TIOCGWINSZ, &ws) == -1)
+		err(1, "TIOCGWINSZ");
+
+	i = fcompute();
 
 	if (tcgetattr(tty.rfd, &tty.attr) == -1)
 		err(1, "tcgetattr");
@@ -313,6 +332,7 @@ tgetc(void)
 		{ "j",		KEY_DOWN },
 		{ "k",		KEY_UP },
 		{ "l",		KEY_RIGHT },
+		{ "\014",	KEY_TOGGLE_DELIM },	/* Ctrl-L */
 		{ "\033[A",	KEY_UP },
 		{ "\033[C",	KEY_RIGHT },
 		{ "\033[B",	KEY_DOWN },
@@ -380,6 +400,33 @@ tmain(void)
 		case KEY_LEFT:
 			j = i - 1;
 			break;
+		case KEY_TOGGLE_DELIM: {
+			char *p;
+			size_t cur_lo;
+
+			cur_lo = f.nmemb > 0 ? f.v[i].lo : 0;
+			regfree(&reg);
+			free(f.v);
+			delim.line = !delim.line;
+			if (delim.line)
+				p = strtopat("");
+			else
+				p = delim.pat;
+			if (regcomp(&reg, p, delim.rflags) != 0)
+				errx(1, "invalid regular expression");
+			if (delim.line)
+				free(p);
+			fcompute();
+			n = f.v[f.nmemb].lo;
+			/* Find first field on the same line. */
+			for (j = 0; j < (ssize_t)f.nmemb &&
+			    f.v[j].lo < cur_lo; j++)
+				continue;
+			if (j == (ssize_t)f.nmemb)
+				j = 0;
+			i = j;
+			break;
+		}
 		case KEY_DOWN:
 		case KEY_UP:
 			if (c == KEY_DOWN) {
@@ -431,6 +478,9 @@ help(void)
 	puts("  -l          split on line breaks (equivalent to empty delimiter set)");
 	puts("  -v          print version and exit");
 	puts("  -x          use terminal alternate screen while selecting");
+	puts("");
+	puts("Keys (during selection):");
+	puts("  Ctrl-L      toggle between line delimiter and the active delimiter");
 	puts("");
 	puts("Trailing command:");
 	puts("  -- command [args]");
@@ -495,6 +545,8 @@ main(int argc, char *argv[])
 
 	if (regcomp(&reg, pat, rflags) != 0)
 		errx(1, "invalid regular expression");
+	delim.pat = pat;
+	delim.rflags = rflags;
 
 	/* Ensure space for yank command and null terminator. */
 	if ((yankargv = calloc(argc + 2, sizeof(char *))) == NULL)
