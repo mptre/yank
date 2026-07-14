@@ -410,9 +410,32 @@ tmain(void)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: yank [-1ilxv] [-d delim] [-g pattern] "
+	fprintf(stderr, "usage: yank [-1hilxv] [-d delim] [-g pattern] "
 	    "[-- command [args]]\n");
 	exit(2);
+}
+
+static void
+help(void)
+{
+	puts("usage: yank [-1hilxv] [-d delim] [-g pattern] [-- command [args]]");
+	puts("");
+	puts("Select and copy parts of stdin.");
+	puts("");
+	puts("Options:");
+	puts("  -1          skip selector and copy immediately when exactly one field matches");
+	puts("  -d delim    use delimiter characters to split fields (default: space)");
+	puts("  -g pattern  use regular expression pattern to match selectable fields");
+	puts("  -h          show this help and exit");
+	puts("  -i          case-insensitive regular expression matching");
+	puts("  -l          split on line breaks (equivalent to empty delimiter set)");
+	puts("  -v          print version and exit");
+	puts("  -x          use terminal alternate screen while selecting");
+	puts("");
+	puts("Trailing command:");
+	puts("  -- command [args]");
+	puts("      run command to receive copied bytes on stdin");
+	puts("      (default command is compiled in as YANKCMD)");
 }
 
 int
@@ -432,11 +455,14 @@ main(int argc, char *argv[])
 #endif
 
 	pat = strtopat(" ");
-	while ((c = getopt(argc, argv, "1ilvxd:g:")) != -1) {
+	while ((c = getopt(argc, argv, "1hilvxd:g:")) != -1) {
 		switch (c) {
 		case '1':
 			one = 1;
 			break;
+		case 'h':
+			help();
+			exit(0);
 		case 'd':
 			free(pat);
 			pat = strtopat(optarg);
