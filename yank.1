@@ -30,7 +30,12 @@ and write the selected field to its
 .Pa stdin .
 The
 .Ar command
-defaults to xsel but could be anything that accepts input on
+defaults to the
+.Ev YANKCMD
+environment variable when it is set and non-empty,
+otherwise to the command defined at build time,
+which defaults to xsel.
+It can be anything that accepts input on
 .Pa stdin ,
 see
 .Sx EXAMPLES .
@@ -66,7 +71,10 @@ Use
 .Ar command
 with zero or more
 .Ar args
-as the yank command.
+as the yank command,
+overriding
+.Ev YANKCMD
+and the built-in default.
 .El
 .Sh COMMANDS
 .Bl -tag -width XXXX
@@ -138,6 +146,24 @@ Yank the selected field to the clipboard as opposed of the default primary
 clipboard:
 .Pp
 .Dl $ yank \(em xsel -b
+.Pp
+Use
+.Ev YANKCMD
+to run another executable without rebuilding.
+The value is a single executable name:
+.Pp
+.Dl $ YANKCMD=wl-copy yank
+.Sh ENVIRONMENT
+.Bl -tag -width Ds
+.It Ev YANKCMD
+Executable used as the yank command when no
+.Ar command
+is supplied after
+.Fl - .
+The value is a single executable name;
+arguments are not parsed.
+If unset or empty, the command defined at build time is used.
+.El
 .Sh DIAGNOSTICS
 .Ex -std
 .Sh SEE ALSO
