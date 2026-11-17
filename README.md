@@ -21,8 +21,9 @@ field to its `stdin`.
 The yank command defaults to
 [xsel(1)][xsel]
 but could be anything that accepts input on `stdin`.
+Set the `YANKCMD` environment variable to an executable name to override that default.
 When invoking yank,
-everything supplied after the `--` option will be used as the yank command,
+everything supplied after the `--` option is used as the yank command instead,
 see examples below.
 
 ## Motivation
@@ -67,6 +68,13 @@ terminal agnostic solution.
 
   ```sh
   $ yank -- xsel -b
+  ```
+
+- Set the yank command for one invocation.
+  `YANKCMD` is the executable name only; put arguments after `--`:
+
+  ```sh
+  $ YANKCMD=wl-copy yank
   ```
 
 ## Installation
@@ -146,7 +154,8 @@ Change the install directory using the `PREFIX` variable:
 $ make PREFIX=DIR install
 ```
 
-The default yank command can be defined using the `YANKCMD` variable.
+The compiled-in yank command can be defined using the `YANKCMD` make variable.
+It is used when the `YANKCMD` environment variable is unset or empty and no command is given after `--`.
 
 - macOS users would prefer `pbcopy(1)`:
 

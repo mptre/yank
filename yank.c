@@ -477,6 +477,7 @@ main(int argc, char *argv[])
 	struct pattern pattern = {.flags = REG_EXTENDED};
 	struct tty tty = {0};
 	const struct field *field = NULL;
+	char *env;
 	int one = 0;
 	int c, i;
 
@@ -526,9 +527,16 @@ main(int argc, char *argv[])
 	/* Ensure space for yank command and null terminator. */
 	if ((yankargv = calloc(argc + 2, sizeof(char *))) == NULL)
 		err(1, NULL);
-	yankargv[0] = YANKCMD;
-	for (i = 0; i < argc; i++)
-		yankargv[i] = argv[i];
+	if (argc > 0) {
+		for (i = 0; i < argc; i++)
+			yankargv[i] = argv[i];
+	} else {
+		env = getenv("YANKCMD");
+		if (env == NULL || env[0] == '\0')
+			yankargv[0] = YANKCMD;
+		else
+			yankargv[0] = env;
+	}
 
 	input();
 	tsetup(&tty);
